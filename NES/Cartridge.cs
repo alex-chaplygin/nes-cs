@@ -22,8 +22,8 @@ namespace NES
 
         public static byte[] GetPrgBank(int n)
         {
-            return prg_mem.Skip<byte>(n * Memory.PRG_LENTGH).
-		Take(Memory.PRG_LENTGH).ToArray();
+            return prg_mem.Skip<byte>(n * Memory.PRG_SIZE).
+		Take(Memory.PRG_SIZE).ToArray();
         }
 
         public static bool ReadFile(string fileName)
@@ -39,15 +39,15 @@ namespace NES
 			if (header[i] != Header[i])
 			    return false;
                     prg_count = header[4];
-                    prg_mem = new byte[prg_count * Memory.PRG_LENTGH];
+                    prg_mem = new byte[prg_count * Memory.PRG_SIZE];
                     chr_count = header[5];
-                    chr_mem = new byte[chr_count * Memory.CHR_LENTGH];
+                    chr_mem = new byte[chr_count * Memory.CHR_SIZE];
                     mirroring = (header[6] & 0x01) != 0;
                     prg_ram = (header[6] & 0x02) != 0;
                     trainer = (header[6] & 0x04) != 0;
                     ignore_mirroring = (header[6] & 0x08) != 0;
 		    // trainer ???
-                    prg_mem = reader.ReadBytes(prg_count * Memory.PRG_LENTGH);
+                    prg_mem = reader.ReadBytes(prg_count * Memory.PRG_SIZE);
 		    // chr_mem ???
                 }                                            
             }
