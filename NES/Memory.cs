@@ -11,10 +11,10 @@ namespace NES
 	const int MEM_SIZE = 0x10000;
         public const int PRG_SIZE = 0x4000;
         public const int CHR_SIZE = 0x2000;
-        public const int RAM_SIZE = 0x2000;
+        public const int RAM_SIZE = 0x800;
         public const int TRN_SIZE = 0x200;
 
-	static byte[] memory = new byte[MEM_SIZE];
+	public static byte[] memory = new byte[MEM_SIZE];
 
 	// Алексеев Андрей
 	public static byte Read(ushort adr)
