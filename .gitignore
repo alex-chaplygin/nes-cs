@@ -1,5 +1,7 @@
 NES/obj
+NES/bin
 .vs
 Test/obj
-NES/bin
+NESTest/obj
+NESTest/bin
 *~
