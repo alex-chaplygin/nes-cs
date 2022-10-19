@@ -50,17 +50,17 @@ namespace NES
         /// <summary>
         /// память программ
         /// </summary>
-        static byte[] prg_mem;
+        public static byte[] prg_mem;
 
         /// <summary>
         /// память изображений
         /// </summary>
-        static byte[] chr_mem;
+        public static byte[] chr_mem;
 
         /// <summary>
         /// память трейнера
         /// </summary>
-        static byte[] trainer_mem;
+        public static byte[] trainer_mem;
 
         /// <summary>
         /// получить банк программы
