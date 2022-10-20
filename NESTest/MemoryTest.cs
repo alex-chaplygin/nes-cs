@@ -28,5 +28,13 @@ namespace NESTest
         {
             Test(0xA, 0x180A);
         }
+
+	[TestMethod]
+        public void ReadWordTest()
+        {
+	    Memory.memory[0x100] = 0xAA;
+            Memory.memory[0x101] = 0xBB;
+            Assert.AreEqual(0xBBAA, Memory.ReadWord(0x100));
+        }
     }
 }

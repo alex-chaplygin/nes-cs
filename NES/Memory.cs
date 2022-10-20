@@ -24,6 +24,11 @@ namespace NES
             return memory[adr];
 	}
 
+	public static ushort ReadWord(ushort adr)
+	{
+	    return (ushort)((Read((ushort)(adr + 1)) << 8) | Read(adr));
+	}
+
 	// Киселев Николай
 	public static void Write(ushort adr, byte val)
 	{
