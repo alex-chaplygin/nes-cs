@@ -91,7 +91,7 @@ namespace NES
         /// </summary>
         /// <param name="fileName">имя файла</param>
         /// <returns>true - если правильный NES файл, иначе false</returns>
-        public static bool ReadFile(string fileName)
+        public static bool ReadFile(string fileName) // Пилипенко Никита
         {
 	        byte[] Header = { 0x4E, 0x45, 0x53, 0x1A };
             byte[] header;

@@ -14,7 +14,7 @@ namespace NES
         /// <summary>
         /// Инициализация Mapper
         /// </summary>
-        public static void Init()
+        public static void Init() // Крюков Никита
         {
            Memory.WriteROM1(Cartridge.GetPrgBank(0));
            Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1));
