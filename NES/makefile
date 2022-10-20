@@ -1,4 +1,4 @@
-src=Memory.cs Program.cs CPU.cs Cartridge.cs
+src=Memory.cs Program.cs CPU.cs Cartridge.cs Mapper.cs
 
 all: /tmp/Program.exe
 

@@ -34,5 +34,9 @@ namespace NES
 	public static void WriteROM1(byte[] bank)
 	{
 	}
+
+	public static void WriteROM2(byte[] bank)
+	{
+	}
     }
 }
