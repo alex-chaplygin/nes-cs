@@ -3,28 +3,36 @@
 namespace NESTest {
     [TestClass]
     public class CartridgeTest {
-        void Test(string fileName, byte[] actualChrMem, byte[] actualTrainerMem) {
+        void Test(string fileName, byte[] expectedChrMem, byte[] expectedTrainerMem) {
             Cartridge.ReadFile(fileName);
-            Assert.AreEqual(Cartridge.chr_mem, actualChrMem);
-            Assert.AreEqual(Cartridge.trainer_mem, actualTrainerMem);
+            byte[] chrMem = Cartridge.chr_mem.Take(16).ToArray();
+            byte[] trainerMem = Cartridge.trainer_mem.Take(16).ToArray();
+            Assert.AreEqual(expectedChrMem, chrMem);
+            Assert.AreEqual(expectedTrainerMem, trainerMem);
         }
 
         [TestMethod]
         public void TetrisTest()
         {
-            Cartridge.ReadFile(@"..\..\..\Tetris.nes");
+            byte[] chrMem = {0x38, 0x4c, 0xc6, 0xc6, 0xc6, 0x64, 0x38, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+            byte[] trainerMem = {};
+            Test(@"..\..\..\Tetris.nes", chrMem, trainerMem);
         }
 
         [TestMethod]
         public void CastlevaniaTest()
         {
-            Cartridge.ReadFile(@"..\..\..\Castlevania.nes");
+            byte[] chrMem = {};
+            byte[] trainerMem = {};
+            Test(@"..\..\..\Castlevania.nes", chrMem, trainerMem);
         }
 
         [TestMethod]
         public void SMBTest()
         {
-            Cartridge.ReadFile(@"..\..\..\Super_mario_brothers.nes");
+            byte[] chrMem = {};
+            byte[] trainerMem = {};
+            Test(@"..\..\..\Super_mario_brothers.nes", chrMem, trainerMem);
         }
     }
 }
