@@ -32,6 +32,14 @@ namespace NES
         /// </summary>
         public const int TRN_SIZE = 0x200;
 	/// <summary>
+        /// область ПЗУ 1
+        /// </summary>	
+	const int ROM1 = 0x8000;
+	/// <summary>
+        /// область ПЗУ 2
+        /// </summary>	
+        const int ROM2 = 0xC000;
+	/// <summary>
         /// все адресное пространство памяти
         /// </summary>
 	public static byte[] memory = new byte[MEM_SIZE];
@@ -78,6 +86,15 @@ namespace NES
         /// <param name="bank">банк программы</param>
 	public static void WriteROM1(byte[] bank)
 	{
+	    int count = 0;
+            for (int i = ROM1; i < ROM2; i++)
+            {
+                if (count < bank.Length)
+                    memory[i] = bank[count];
+                else
+                    break;
+                count++;
+            }
 	}
 
 	/// <summary>
@@ -86,6 +103,15 @@ namespace NES
         /// <param name="bank">банк программы</param>
 	public static void WriteROM2(byte[] bank)
 	{
+	    int count = 0;
+            for (int i = ROM2; i < memory.Length; i++)
+            {
+                if (count < bank.Length)
+                    memory[i] = bank[count];
+                else
+                    break;
+                count++;
+            }
 	}
     }
 }
