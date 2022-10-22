@@ -15,37 +15,43 @@ namespace NES
         /// общий размер памяти
         /// </summary>
 	const int MEM_SIZE = 0x10000;
+
 	/// <summary>
         /// размер банка программы
         /// </summary>
         public const int PRG_SIZE = 0x4000;
+
 	/// <summary>
         /// размер банка изображений
         /// </summary>
         public const int CHR_SIZE = 0x2000;
+
 	/// <summary>
         /// размер оперативной памяти
         /// </summary>
         public const int RAM_SIZE = 0x800;
+
 	/// <summary>
         /// размер трейнера
         /// </summary>
         public const int TRN_SIZE = 0x200;
+
 	/// <summary>
         /// область ПЗУ 1
         /// </summary>	
 	const int ROM1 = 0x8000;
+
 	/// <summary>
         /// область ПЗУ 2
         /// </summary>	
         const int ROM2 = 0xC000;
+
 	/// <summary>
         /// все адресное пространство памяти
         /// </summary>
 	public static byte[] memory = new byte[MEM_SIZE];
 
 	// Алексеев Андрей
-
 	/// <summary>
 	///   Читать байт из памяти
 	/// </summary>
