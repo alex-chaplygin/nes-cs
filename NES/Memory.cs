@@ -51,7 +51,60 @@ namespace NES
         /// </summary>
 	public static byte[] memory = new byte[MEM_SIZE];
 
-	// Алексеев Андрей
+	/// <summary>
+	/// Функция чтения памяти
+	/// </summary>
+	/// <param name="adr">Адрес памяти</param>
+	/// <returns>Значение из памяти</returns>
+	delegate byte MemoryRead(ushort adr);
+
+	/// <summary>
+	/// Функция записи в память
+	/// </summary>
+	/// <param name="adr">Адрес памяти</param>
+	/// <param name="value">Значение, записываемое в память</param>
+	delegate void MemoryWrite(ushort adr, byte value);
+
+	/// <summary>
+	/// Регион памяти
+	/// </summary>
+	struct MemoryRegion
+        {
+	    /// <summary>
+	    /// Верхняя граница
+	    /// </summary>
+	    public int upper;
+
+	    /// <summary>
+	    ///   Функция чтения
+	    /// </summary>
+	    public MemoryRead read;
+
+	    /// <summary>
+	    ///   Функция записи
+	    /// </summary>
+	    public MemoryWrite write;
+
+	    public MemoryRegion(int u, MemoryRead r, MemoryWrite w)
+            {
+		upper = u;
+		read = r;
+		write = w;
+            }
+        }
+
+	/// <summary>
+	///   Таблица регионов памяти
+	/// </summary>
+	static MemoryRegion[] memoryTable = new MemoryRegion[]
+	{
+	    new MemoryRegion( 0x2000, ReadRAM, WriteRAM ),
+	    new MemoryRegion( 0x4015, PPU.Read, PPU.Write ),
+	    new MemoryRegion( 0x4018, Input.Read, Input.Write ),
+	    new MemoryRegion( 0x8000, ReadM, WriteM ),
+	    new MemoryRegion( 0x10000, ReadM, Mapper.Write ),
+	};
+	
 	/// <summary>
 	///   Читать байт из памяти
 	/// </summary>
@@ -59,9 +112,12 @@ namespace NES
         /// <returns>значение из памяти</returns>
 	public static byte Read(ushort adr)
 	{
-	    while (adr >= RAM_SIZE)
-                adr -= RAM_SIZE;
-            return memory[adr];
+	    for (int i = 0; i < memoryTable.Length; i++)
+            {
+		if (adr < memoryTable[i].upper)
+		    return memoryTable[i].read(adr);
+            }
+	    return 0;
 	}
 
 	/// <summary>
@@ -82,9 +138,48 @@ namespace NES
         /// <param name="val">записываемое значение</param>
 	public static void Write(ushort adr, byte val)
 	{
-	    memory[adr] = val;
+	    for (int i = 0; i < memoryTable.Length; i++)
+	    {
+		if (adr < memoryTable[i].upper)
+		    memoryTable[i].write(adr, val);
+	    }
 	}
 
+	/// <summary>
+	///   Простое чтение
+	/// </summary>
+	public static byte ReadM(ushort adr)
+	{
+	    return memory[adr];
+	}
+
+	/// <summary>
+	///   Простая запись
+	/// </summary>
+	public static void WriteM(ushort adr, byte value)
+        {
+	    memory[adr] = value;
+        }
+
+	// Алексеев Андрей
+	/// <summary>
+	///   Чтение из ОЗУ
+	/// </summary>
+	public static byte ReadRAM(ushort adr)
+	{
+	    adr &= 0x7FF;
+	    return memory[adr];
+	}
+
+	// Киселев Николай
+	/// <summary>
+	///   Запись в ОЗУ
+	/// </summary>
+	public static void WriteRAM(ushort adr, byte val)
+	{
+	    memory[adr] = val;
+	}
+	
 	// Геворкян Арнольд
 	/// <summary>
 	///   Записать ПЗУ1
