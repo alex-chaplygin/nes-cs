@@ -19,5 +19,10 @@ namespace NES
            Memory.WriteROM1(Cartridge.GetPrgBank(0));
            Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1));
         }
+
+        public static void Write(ushort adr, byte value)
+        {
+
+        }
     }
 }
