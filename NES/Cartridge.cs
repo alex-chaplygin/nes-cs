@@ -7,6 +7,11 @@ using System.IO;
 
 namespace NES
 {
+    public enum Mirroring {
+        Horisontal,
+        Vertical
+    }
+
     /// <summary>
     /// класс картриджей
     /// </summary>
@@ -25,7 +30,7 @@ namespace NES
         /// <summary>
         /// зеркальное отображение: горизонтальное (вертикальное расположение)
         /// </summary>
-        public static bool mirroring;
+        public static Mirroring mirroring;
 
         /// <summary>
         /// если значение true, то трейнер присутствует
@@ -105,7 +110,7 @@ namespace NES
                             return false;
                     prg_count = header[4];
                     chr_count = header[5];
-                    mirroring = (header[6] & 0x01) != 0;
+                    mirroring = (Mirroring)(header[6] & 0x01);
                     prg_ram = (header[6] & 0x02) != 0;
                     trainer = (header[6] & 0x04) != 0;
                     ignore_mirroring = (header[6] & 0x08) != 0;
