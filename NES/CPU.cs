@@ -139,7 +139,7 @@ namespace NES
 	/// <summary>
 	///   Преобразовать два байта в слово
 	/// </summary>
-        static ushort ToWord(byte high, byte low) 
+        public static ushort ToWord(byte high, byte low) 
         {
             return (ushort)((high << 8) +low);
         }
