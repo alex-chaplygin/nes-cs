@@ -48,6 +48,8 @@
     <Compile Include="Memory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Mapper.cs" />
+    <Compile Include="PPU.cs" />
+    <Compile Include="Input.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
