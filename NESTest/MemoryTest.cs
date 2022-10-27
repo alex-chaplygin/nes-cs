@@ -30,6 +30,25 @@ namespace NESTest
         }
 
 	[TestMethod]
+        public void ReadTest4()
+        {
+            Test(0x5333, 0x5333);
+        }
+        
+        [TestMethod]
+        public void ReadTest5()
+        {
+            Test(0x8000, 0x8000);
+        }
+
+	[TestMethod]
+        public void WriteTest()
+        {
+            Memory.Write(0x800, 5);           
+            Assert.AreEqual(5, Memory.Read(0x800));
+        }
+	
+	[TestMethod]
         public void ReadWordTest()
         {
 	    Memory.memory[0x100] = 0xAA;
