@@ -148,7 +148,7 @@ namespace NES
 	/// <summary>
 	///   Простое чтение
 	/// </summary>
-	public static byte ReadM(ushort adr)
+	static byte ReadM(ushort adr)
 	{
 	    return memory[adr];
 	}
@@ -156,7 +156,7 @@ namespace NES
 	/// <summary>
 	///   Простая запись
 	/// </summary>
-	public static void WriteM(ushort adr, byte value)
+	static void WriteM(ushort adr, byte value)
         {
 	    memory[adr] = value;
         }
@@ -165,7 +165,7 @@ namespace NES
 	/// <summary>
 	///   Чтение из ОЗУ
 	/// </summary>
-	public static byte ReadRAM(ushort adr)
+	static byte ReadRAM(ushort adr)
 	{
 	    adr &= 0x7FF;
 	    return memory[adr];
@@ -175,7 +175,7 @@ namespace NES
 	/// <summary>
 	///   Запись в ОЗУ
 	/// </summary>
-	public static void WriteRAM(ushort adr, byte val)
+	static void WriteRAM(ushort adr, byte val)
 	{
 	    memory[adr] = val;
 	}
