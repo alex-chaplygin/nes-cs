@@ -208,6 +208,7 @@ namespace NES
 	// Носорев Николай
         static void BRK(byte val, ushort adr) 
         {
+	    Interrupt(Interruption.IRQ);
         }
 
 	// Коваль Никита
@@ -221,7 +222,7 @@ namespace NES
 	/// </summary>
         public static void Interrupt(Interruption interruption)
         {
-            if (interrupt_flag || interruption != Interruption.IRQ)
+            if (!interrupt_flag || interruption != Interruption.IRQ)
             {
                 Push(AssembleFlags());
                 PushWord(PC);
@@ -232,6 +233,18 @@ namespace NES
                     SP = 0xFF;                   
                 }              
             }      
+        }
+
+	/// <summary>
+        ///   Шаг процессора
+        /// </summary>
+       public static int Step()
+        {
+            ushort operandAddr = 0;
+            byte command = Fetch();
+	    byte operandVal = table[command].adrMode(ref operandAddr);
+            table[command].op(operandVal,operandAddr);
+	    return table[command].cycles;
         }
     }
 }
