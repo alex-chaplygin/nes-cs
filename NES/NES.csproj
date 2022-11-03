@@ -50,6 +50,7 @@
     <Compile Include="Mapper.cs" />
     <Compile Include="PPU.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="Mappers/MMC1.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
