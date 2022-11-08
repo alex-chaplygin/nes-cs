@@ -11,7 +11,16 @@ namespace NES
     ///   Графический процессор
     /// </summary>
     public class PPU
-    {	
+    {
+	const int PPU_MEM_SIZE = 0x4000;
+        public const int PATTERN_TABLE_0 = 0x0;
+        public const int PATTERN_TABLE_1 = 0x1000;
+
+	/// <summary>
+        /// Память видеопроцессора
+        /// </summary>
+        public static byte[] ppu_memory = new byte[PPU_MEM_SIZE];
+
 	/// <summary>
 	///   Регистр адреса
 	/// </summary>
@@ -54,6 +63,24 @@ namespace NES
                 address = (ushort)(address + val);
                 isFirst = true;
             }
-        }	
+        }
+
+	        /// <summary>
+        /// Записать таблицу шаблонов 0
+        /// </summary>
+        /// <param name="data">Данные шаблонов</param>
+        public static void WritePattern0(byte[] data)
+        {
+            data.CopyTo(ppu_memory, PATTERN_TABLE_0);
+        }
+
+        /// <summary>
+        /// Записать таблицу шаблонов 1
+        /// </summary>
+        /// <param name="data">Данные шаблонов</param>
+        public static void WritePattern1 (byte[] data)
+        {
+            data.CopyTo(ppu_memory, PATTERN_TABLE_1);
+        }
     }
 }
