@@ -1,4 +1,4 @@
-﻿﻿using NES;
+﻿using NES;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -86,7 +86,7 @@ namespace NES
         /// </summary>
         public static bool negative_flag;
 
-	/// <summary>
+        /// <summary>
         /// Дополнительный цикл работы команды
         /// </summary>
         static int add_cycle;
@@ -95,7 +95,7 @@ namespace NES
         /// Пересечение страниц в результате индексации с помощью X, Y
         /// </summary>
         static bool cross;
-	
+
         /// <summary>
         /// Функция команды 
         /// </summary>
@@ -143,7 +143,7 @@ namespace NES
         /// </summary>
         static Instruction[] table = new Instruction[]
         {
-	    new Instruction(BRK, Implied, 7),
+            new Instruction(BRK, Implied, 7),
             new Instruction(ORA, XIndirect, 6),
             new Instruction(NUL, Implied, 0),
             new Instruction(NUL, Implied, 0),
@@ -151,7 +151,7 @@ namespace NES
             new Instruction(ORA, Zero, 3),
             new Instruction(ASL, Zero, 5),
             new Instruction(NUL, Implied, 0),
-	};
+        };
 
 	/// <summary>
 	///   Преобразовать два байта в слово
@@ -309,8 +309,7 @@ namespace NES
         /// </summary>
 	static void NUL(byte val, ushort adr)
         {
-            throw new Exception($"Вызвана несуществующая команда: 
-	    {Memory.Read((ushort)(PC - 1)):X}");
+            throw new Exception($"Вызвана несуществующая команда: {Memory.Read((ushort)(PC - 1)):X}");
         }
 
 	//сложить аккумулятор с флагом переноса и с операндом и записать в аккумулятор
@@ -340,8 +339,8 @@ namespace NES
         /// </summary>
         static void BRK(byte val, ushort adr) 
         {
-	    break_flag = true;
-	    Interrupt(Interruption.IRQ);
+            break_flag = true;
+	        Interrupt(Interruption.IRQ);
         }
 
 	// Малышев Максим
@@ -722,12 +721,12 @@ namespace NES
        public static int Step()
         {
             ushort operandAddr = 0;
-	    add_cycle = 0;
+            add_cycle = 0;
             cross = false;
             byte command = Fetch();
-	    byte operandVal = table[command].adrMode(ref operandAddr);
+	        byte operandVal = table[command].adrMode(ref operandAddr);
             table[command].op(operandVal,operandAddr);
-	    return table[command].cycles + add_cycle;
+	        return table[command].cycles + add_cycle;
         }
     }
 }

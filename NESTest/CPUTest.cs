@@ -61,7 +61,6 @@ namespace NESTest
             CPU.PC = 0x1234;
             CPU.SP = 0x80;
             CPU.interrupt_flag = true;
-            CPU.SP = 0x80;  CPU.PC = 0x1234;
             CPU.Interrupt(Interruption.NMI);
             Assert.AreEqual(true, CPU.interrupt_flag);
             Assert.AreEqual(0x80 - 3, CPU.SP);
@@ -98,9 +97,10 @@ namespace NESTest
             CPU.SP = 0xFF;
             CPU.PC = 0x234;byte instr = 0;// 0 соотв.номеру BRK в CPU.table
             CPU.interrupt_flag = false;
-            Memory.WriteM(CPU.PC, instr);
+            Memory.memory[CPU.PC] = instr;
             //Вектор прерывания
-            Memory.WriteM(0xFFFE, 0xCD); Memory.WriteM(0xFFFF, 0xAB);
+            Memory.memory[0xFFFE] = 0xCD;
+            Memory.memory[0xFFFF] = 0xAB;
             int cycles = CPU.Step();
             Assert.AreEqual(7, cycles);
             Assert.AreEqual(0xABCD,CPU.PC);
@@ -200,6 +200,38 @@ namespace NESTest
             CPU.A = 0xFF;
             CPU.SBC(0x00, adr);
             Assert.IsTrue(!CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void XIndirectTest()
+        {
+            CPU.X = 0x4;
+            CPU.PC = 1;
+            Memory.memory[1] = 0x10;
+            Memory.memory[0x14] = 0x00;
+            Memory.memory[0x15] = 0x82;
+            Memory.memory[0x8200] = 0xAA;
+            ushort adr = 0;
+            byte val = CPU.XIndirect(ref adr);
+            Assert.AreEqual(0xAA, val);
+            Assert.AreEqual(0x8200, adr);
+        }
+
+        [TestMethod]
+        public void XIndirectWrappingTest()
+        {
+            CPU.X = 0x15;
+
+            CPU.PC = 1;
+            Memory.memory[1] = 0xFF;
+            Memory.memory[0x14] = 0x00;
+            Memory.memory[0x15] = 0x82;
+            Memory.memory[0x8200] = 0xAA;
+
+            ushort adr = 0xA0;
+            byte val = CPU.XIndirect(ref adr);
+            Assert.AreEqual(0xAA, val);
+            Assert.AreEqual(0x8200, adr);
         }
     }
 }
