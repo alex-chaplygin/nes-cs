@@ -106,5 +106,22 @@ namespace NESTest
             Assert.AreEqual(0xABCD,CPU.PC);
             Assert.AreEqual(0x235, CPU.PopWord());
         }
+
+	//Киселев Николай
+        [TestMethod]
+        public void AbsoluteTest()
+        {
+            CPU.PC = 0x2253;
+            CPU.Y = 8;
+        
+            Memory.Write(CPU.PC, 0x27);
+            Memory.Write((ushort)(CPU.PC+1), 0x17);
+            Memory.Write((ushort)(0x1727 + CPU.Y), 35);
+            ushort adr = 0; // = 0x2253; //Так как  CPU.AbsoluteY обязательно требует аргумент, то допустим он такой. Я так понял
+                                         //это не имеет значение, ведь  внутри функции изменяется значение этого аргумента
+
+            Assert.AreEqual(Memory.Read((ushort)(0x1727 + CPU.Y)), CPU.AbsoluteY(ref adr)); //Проверка на совпадение значений
+            Assert.AreEqual(0x1727 + CPU.Y, adr); // Проверка на совпадение адреса
+        }	
     }
 }
