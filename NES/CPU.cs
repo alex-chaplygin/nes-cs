@@ -331,7 +331,7 @@ namespace NES
         /// <param name="adr"></param>
         static void AND(byte val, ushort adr)
         {
-            A = (byte)(A & val);
+            A &= val;
 	    SetZeroNeg(A);
 	    add_cycle = Convert.ToInt32(cross);
         }
@@ -585,6 +585,19 @@ namespace NES
             A |= val;
 	    SetZeroNeg(A);
 	    add_cycle = Convert.ToInt32(cross);
+        }
+
+	// Малышев Максим
+        /// <summary>
+        /// Исключающее ИЛИ аккумулятора и операнда
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void EOR(byte val, ushort adr)
+        {
+            A ^= val;
+            SetZeroNeg(A);
+            add_cycle = Convert.ToInt32(cross);
         }
 	
 	/// <summary>
