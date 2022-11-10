@@ -519,8 +519,8 @@ namespace NES
         /// </summary>
         static void DEX(byte val, ushort adr)
         {
-            byte res = (byte)(X - 1);
-            SetZeroNeg(res);
+	    X--;
+            SetZeroNeg(X);
         }
 
         /// <summary>
@@ -528,8 +528,8 @@ namespace NES
         /// </summary>
         static void DEY(byte val, ushort adr)
         {
-            byte res = (byte)(Y - 1);
-            SetZeroNeg(res);
+	    Y--;
+            SetZeroNeg(Y);
         }
 	
         /// <summary>
@@ -547,8 +547,8 @@ namespace NES
         /// </summary>
         static void INX(byte val, ushort adr)
         {
-            byte res = (byte)(X + 1);
-            SetZeroNeg(res);
+	    X++;
+            SetZeroNeg(X);
         }
 
         /// <summary>
@@ -556,8 +556,8 @@ namespace NES
         /// </summary>
         static void INY(byte val, ushort adr)
         {
-            byte res = (byte)(Y + 1);
-            SetZeroNeg(res);
+	    Y++;
+            SetZeroNeg(Y);
         }
 	
         /// <summary>
