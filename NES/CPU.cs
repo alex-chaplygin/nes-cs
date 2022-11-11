@@ -151,6 +151,117 @@ namespace NES
             new Instruction(ORA, Zero, 3),
             new Instruction(ASL, Zero, 5),
             new Instruction(NUL, Implied, 0),
+            new Instruction(PHP, Implied, 3),
+            new Instruction(ORA, Immediate, 2),
+            new Instruction(ASL, Accumulator, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(ORA, Absolute, 4),
+            new Instruction(ASL, Absolute, 6),
+            new Instruction(NUL, Implied, 0),
+            // 0x10
+            new Instruction(BPL, Relative, 2),
+            new Instruction(ORA, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(ORA, ZeroX, 4),
+            new Instruction(ASL, ZeroX, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CLC, Implied, 2),
+            new Instruction(ORA, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(ORA, AbsoluteX, 4),
+            new Instruction(ASL, AbsoluteX, 7),
+            new Instruction(NUL, Implied, 0),
+            // 0x20
+            new Instruction(JSR, Absolute, 6),
+            new Instruction(AND, XIndirect, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(BIT, Zero, 3),
+            new Instruction(AND, Zero, 3),
+            new Instruction(ROL, Zero, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(PLP, Implied, 4),
+            new Instruction(AND, Immediate, 2),
+            new Instruction(ROL, Accumulator, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(BIT, Absolute, 4),
+            new Instruction(AND, Absolute, 4),
+            new Instruction(ROL, Absolute, 6),
+            new Instruction(NUL, Implied, 0),
+            // 0x30
+            new Instruction(BMI, Relative, 2),
+            new Instruction(AND, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(AND, ZeroX, 4),
+            new Instruction(ROL, ZeroX, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(SEC, Implied, 2),
+            new Instruction(AND, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(AND, AbsoluteX, 4),
+            new Instruction(ROL, AbsoluteX, 7),
+            new Instruction(NUL, Implied, 0),
+            // 0x40
+            new Instruction(RTI, Implied, 6),
+            new Instruction(EOR, XIndirect, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(EOR, Zero, 3),
+            new Instruction(LSR, Zero, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(PHA, Implied, 3),
+            new Instruction(EOR, Immediate, 2),
+            new Instruction(LSR, Accumulator, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(JMP, Absolute, 3),
+            new Instruction(EOR, Absolute, 4),
+            new Instruction(LSR, Absolute, 6),
+            new Instruction(NUL, Implied, 0),
+            // 0x50
+            new Instruction(BVC, Relative, 2),
+            new Instruction(EOR, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(EOR, ZeroX, 4),
+            new Instruction(LSR, ZeroX, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CLI, Implied, 2),
+            new Instruction(EOR, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(EOR, AbsoluteX, 4),
+            new Instruction(LSR, AbsoluteX, 7),
+            new Instruction(NUL, Implied, 0),
+            // 0x60
+            new Instruction(RTS, Implied, 6),
+            new Instruction(ADC, XIndirect, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(ADC, Zero, 3),
+            new Instruction(ROR, Zero, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(PLA, Implied, 4),
+            new Instruction(ADC, Immediate, 2),
+            new Instruction(ROR, Accumulator, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(JMP, Indirect, 5),
+            new Instruction(ADC, Absolute, 4),
+            new Instruction(ROR, Absolute, 6),
+            new Instruction(NUL, Implied, 0),
+            // 0x70
         };
 
 	/// <summary>
@@ -240,6 +351,27 @@ namespace NES
         }
 
         /// <summary>
+        /// Абсолютная адресация памяти
+        /// </summary>
+        /// <param name="adr"></param>
+        /// <returns></returns>
+        static byte Absolute(ref ushort adr)
+        {
+            adr = ToWord(Fetch(), Fetch());
+            return Memory.Read(adr);
+        }
+
+        static byte Accumulator(ref ushort adr)
+        {
+            return A;
+        }
+
+        static byte Relative(ref ushort adr)
+        {
+            return Fetch();
+        }
+
+        /// <summary>
         /// Режим адресации без операндов
         /// </summary>
         /// <param name="adr"></param>
@@ -250,12 +382,13 @@ namespace NES
         }
 
         /// <summary>
-        ///  Абсолютная адресация
+        /// Адресация следующего значения из памяти
         /// </summary>
-        public static byte Absolute(ref ushort adr)
+        /// <param name="adr"></param>
+        /// <returns></returns>
+        static byte Immediate(ref ushort adr)
         {
-            adr = ToWord(Fetch(), Fetch());
-            return Memory.Read(adr);
+            return Fetch();
         }
 
         /// <summary>
@@ -292,6 +425,26 @@ namespace NES
             return Memory.Read(adr);
         }
 
+        static byte ZeroX(ref ushort adr)
+        {
+            adr = (byte)(Fetch() + X);
+            return Memory.Read(adr);
+        }
+
+        static byte ZeroY(ref ushort adr)
+        {
+            adr = (byte)(Fetch() + Y);
+            return Memory.Read(adr);
+        }
+
+        static byte Indirect(ref ushort adr)
+        {
+            adr = ToWord(Fetch(), Fetch());
+            adr = Memory.ReadWord(adr);
+            return Memory.Read(adr);
+
+        }
+
         /// <summary>
         /// Режим адресации косвенный со смещением X
         /// </summary>
@@ -303,11 +456,18 @@ namespace NES
             adr = Memory.ReadWord((ushort)((adr + X) & 0xFF));
             return Memory.Read(adr);
         }
-	
+
+        static byte IndirectY(ref ushort adr)
+        {
+            adr = Fetch();
+            adr = Memory.ReadWord((ushort)(adr & 0xFF));
+            return (byte)(Memory.Read(adr) + Y);
+        }
+
         /// <summary>
         /// Несуществующая команда
         /// </summary>
-	static void NUL(byte val, ushort adr)
+        static void NUL(byte val, ushort adr)
         {
             throw new Exception($"Вызвана несуществующая команда: {Memory.Read((ushort)(PC - 1)):X}");
         }
@@ -341,6 +501,57 @@ namespace NES
         {
             break_flag = true;
 	        Interrupt(Interruption.IRQ);
+        }
+
+
+        static void BIT(byte val, ushort adr)
+        {
+
+        }
+
+        static void ROL(byte val, ushort adr)
+        {
+
+        }
+
+        static void PLP(byte val, ushort adr)
+        {
+
+        }
+
+        static void RTI(byte val, ushort adr)
+        {
+
+        }
+
+        static void LSR(byte val, ushort adr)
+        {
+
+        }
+
+        static void PHA(byte val, ushort adr)
+        {
+
+        }
+
+        static void ADC(byte val, ushort adr)
+        {
+
+        }
+
+        static void RTS(byte val, ushort adr)
+        {
+
+        }
+
+        static void ROR(byte val, ushort adr)
+        {
+
+        }
+
+        static void PLA(byte val, ushort adr)
+        {
+
         }
 
 	// Малышев Максим
