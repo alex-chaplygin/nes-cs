@@ -503,6 +503,46 @@ namespace NES
             SetZeroNeg(result);
             add_cycle = cross ? 1 : 0;
         }
+
+	/// <summary>
+        /// Очищает флаг переноса
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void CLC(byte val, ushort adr)
+        {
+            carry_flag = false;
+        }
+
+        /// <summary>
+        /// Очищает флаг десятичного режима
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void CLВ(byte val, ushort adr)
+        {
+            decimal_flag = false;
+        }
+
+        /// <summary>
+        /// Очищает флаг запрета прерываний
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void CLI(byte val, ushort adr)
+        {
+            interrupt_flag = false;
+        }
+
+        /// <summary>
+        /// Очищает флаг переполнения
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void CLV(byte val, ushort adr)
+        {
+            overflow_flag = false;
+        }
 	
         /// <summary>
         /// Уменьшить ячейку памяти
@@ -598,6 +638,36 @@ namespace NES
             A ^= val;
             SetZeroNeg(A);
             add_cycle = Convert.ToInt32(cross);
+        }
+
+	/// <summary>
+        /// Установить флаг переноса
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void SEC(byte val, ushort adr)
+        {
+            carry_flag = true;
+        }
+
+        /// <summary>
+        /// Установить флаг десятичного режима
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void SED(byte val, ushort adr)
+        {
+            decimal_flag = true;
+        }
+
+        /// <summary>
+        /// Установить флаг запрета прерываний
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void SEI(byte val, ushort adr)
+        {
+            interrupt_flag = true;
         }
 	
 	/// <summary>
