@@ -262,6 +262,158 @@ namespace NES
             new Instruction(ROR, Absolute, 6),
             new Instruction(NUL, Implied, 0),
             // 0x70
+            new Instruction(BVS, Relative, 2),
+            new Instruction(ADC, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(ADC, ZeroX, 4),
+            new Instruction(ROR, ZeroX, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(SEI, Implied, 2),
+            new Instruction(ADC, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(ADC, AbsoluteX, 4),
+            new Instruction(ROR, AbsoluteX, 7),
+            new Instruction(NUL, Implied, 0),
+            // 0x80
+            new Instruction(NUL, Implied, 0),
+            new Instruction(STA, XIndirect, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(STY, Zero, 3),
+            new Instruction(STA, Zero, 3),
+            new Instruction(STX, Zero, 3),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(DEY, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(TXA, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(STY, Absolute, 4),
+            new Instruction(STA, Absolute, 4),
+            new Instruction(STX, Absolute, 4),
+            new Instruction(NUL, Implied, 0),
+            // 0x90
+            new Instruction(BCC, Relative, 2),
+            new Instruction(STA, IndirectY, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(STY, ZeroX, 4),
+            new Instruction(STA, ZeroX, 4),
+            new Instruction(STX, ZeroY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(TYA, Implied, 2),
+            new Instruction(STA, AbsoluteY, 5),
+            new Instruction(TXS, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(STA, AbsoluteX, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            // 0xA0
+            new Instruction(LDY, Immediate, 2),
+            new Instruction(LDA, XIndirect, 6),
+            new Instruction(LDX, Immediate, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(LDY, Zero, 3),
+            new Instruction(LDA, Zero, 3),
+            new Instruction(LDX, Zero, 3),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(TAY, Implied, 2),
+            new Instruction(LDA, Immediate, 2),
+            new Instruction(TAX, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(LDY, Absolute, 4),
+            new Instruction(LDA, Absolute, 4),
+            new Instruction(LDX, Absolute, 4),
+            new Instruction(NUL, Implied, 0),
+            // 0xB0
+            new Instruction(BCS, Relative, 2),
+            new Instruction(LDA, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(LDY, ZeroX, 4),
+            new Instruction(LDA, ZeroX, 4),
+            new Instruction(LDX, ZeroY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CLV, Implied, 2),
+            new Instruction(LDA, AbsoluteY, 4),
+            new Instruction(TSX, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(LDY, AbsoluteX, 4),
+            new Instruction(LDA, AbsoluteX, 4),
+            new Instruction(LDX, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            // 0xC0
+            new Instruction(CPY, Immediate, 2),
+            new Instruction(CMP, XIndirect, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CPY, Zero, 3),
+            new Instruction(CMP, Zero, 3),
+            new Instruction(DEC, Zero, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(INY, Implied, 2),
+            new Instruction(CMP, Immediate, 2),
+            new Instruction(DEX, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CPY, Absolute, 4),
+            new Instruction(CMP, Absolute, 4),
+            new Instruction(DEC, Absolute, 6),
+            new Instruction(NUL, Implied, 0),
+            // 0xD0
+            new Instruction(BNE, Relative, 2),
+            new Instruction(CMP, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CMP, ZeroX, 4),
+            new Instruction(DEC, ZeroX, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CLD, Implied, 2),
+            new Instruction(CMP, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CMP, AbsoluteX, 4),
+            new Instruction(DEC, AbsoluteX, 7),
+            new Instruction(NUL, Implied, 0),
+            // 0xE0
+            new Instruction(CPX, Immediate, 2),
+            new Instruction(SBC, XIndirect, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CPX, Zero, 3),
+            new Instruction(SBC, Zero, 3),
+            new Instruction(INC, Zero, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(INX, Implied, 2),
+            new Instruction(SBC, Immediate, 2),
+            new Instruction(NOP, Implied, 2),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(CPX, Absolute, 4),
+            new Instruction(SBC, Absolute, 4),
+            new Instruction(INC, Absolute, 6),
+            new Instruction(NUL, Implied, 0),
+            // 0xF0
+            new Instruction(BEQ, Relative, 2),
+            new Instruction(SBC, IndirectY, 5),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(SBC, ZeroX, 4),
+            new Instruction(INC, ZeroX, 6),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(SED, Implied, 2),
+            new Instruction(SBC, AbsoluteY, 4),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(NUL, Implied, 0),
+            new Instruction(SBC, AbsoluteX, 4),
+            new Instruction(INC, AbsoluteX, 7),
+            new Instruction(NUL, Implied, 0)
         };
 
 	/// <summary>
@@ -534,11 +686,6 @@ namespace NES
 
         }
 
-        static void ADC(byte val, ushort adr)
-        {
-
-        }
-
         static void RTS(byte val, ushort adr)
         {
 
@@ -554,7 +701,82 @@ namespace NES
 
         }
 
-	// Малышев Максим
+        static void PHP(byte val, ushort adr)
+        {
+
+        }
+
+        static void STA(byte val, ushort adr)
+        {
+
+        }
+
+        static void STY(byte val, ushort adr)
+        {
+
+        }
+
+        static void STX(byte val, ushort adr)
+        {
+
+        }
+
+        static void TXA(byte val, ushort adr)
+        {
+
+        }
+
+        static void TXS(byte val, ushort adr)
+        {
+
+        }
+
+        static void TYA(byte val, ushort adr)
+        {
+
+        }
+
+        static void LDA(byte val, ushort adr)
+        {
+
+        }
+
+        static void LDX(byte val, ushort adr)
+        {
+
+        }
+
+        static void LDY(byte val, ushort adr)
+        {
+
+        }
+
+        static void TAX(byte val, ushort adr)
+        {
+
+        }
+
+        static void TAY(byte val, ushort adr)
+        {
+
+        }
+
+        static void TSX(byte val, ushort adr)
+        {
+
+        }
+
+        static void CLD(byte val, ushort adr)
+        {
+
+        }
+
+        static void NOP(byte val, ushort adr)
+        {
+
+        }
+
+        // Малышев Максим
         /// <summary>
         /// Побитовое "И" аккумулятора с операндом
         /// </summary>
