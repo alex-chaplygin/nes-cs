@@ -122,6 +122,30 @@ namespace NESTest
 
             Assert.AreEqual(Memory.Read((ushort)(0x1727 + CPU.Y)), CPU.AbsoluteY(ref adr)); //Проверка на совпадение значений
             Assert.AreEqual(0x1727 + CPU.Y, adr); // Проверка на совпадение адреса
-        }	
+        }
+
+	[TestMethod]
+        public void ASL_Test_1()
+        {
+            byte val = 0xFF;
+            ushort adr = 0;
+            CPU.ASL(val, adr);
+            Assert.AreEqual(true, CPU.carry_flag);
+            Assert.AreEqual(254, CPU.A);
+            Assert.AreEqual(false, CPU.zero_flag);
+            Assert.AreEqual(true, CPU.negative_flag);
+        }
+
+        [TestMethod]
+        public void ASL_Test_2()
+        {
+            byte val = 0x00;
+            ushort adr = 0;
+            CPU.ASL(val, adr);
+            Assert.AreEqual(false, CPU.carry_flag);
+            Assert.AreEqual(0, CPU.A);
+            Assert.AreEqual(true, CPU.zero_flag);
+            Assert.AreEqual(false, CPU.negative_flag);
+        }
     }
 }

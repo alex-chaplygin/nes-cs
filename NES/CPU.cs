@@ -337,9 +337,16 @@ namespace NES
         }
 
 	// Коваль Никита
+	/// <summary>
+        /// сдвигает все биты содержимого аккумулятора или памяти на один бит влево
+        /// </summary>
+        /// <param name="val">значение из памяти</param>
+        /// <param name="adr">адрес</param>
         static void ASL(byte val, ushort adr)
         {
-            
+            carry_flag = (val >> 7) == 1;
+            A = (byte)(val << 1);
+	    SetZeroNeg(A);
         }
 
 	/// <summary>
@@ -605,7 +612,7 @@ namespace NES
         /// </summary>
         static void JMP(byte val, ushort adr)
         {
-            PC = Memory.ReadWord(adr);
+            PC = adr;
         }
 	
         /// <summary>
@@ -614,7 +621,7 @@ namespace NES
         static void JSR(byte val, ushort adr)
         {
             PushWord(PC);
-            PC = Memory.ReadWord(adr);
+            PC = adr;
         }
 	
         /// <summary>
