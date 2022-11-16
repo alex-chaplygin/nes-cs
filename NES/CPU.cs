@@ -313,6 +313,27 @@ namespace NES
 	    {Memory.Read((ushort)(PC - 1)):X}");
         }
 
+	//сложить аккумулятор с флагом переноса и с операндом и записать в аккумулятор
+        //флаг переполнения устанавливается когда изменился знак в результате сложения у акк был знак  а в результате получился знак другой знак это 7 бит
+        //дома тест
+        public static void ADC(byte val, ushort adr)
+        {
+            ushort result = (ushort)(A + val + Convert.ToByte(carry_flag));
+            overflow_flag = (A & 0x80) != (result & 0x80);
+            carry_flag = (result > 0xFF);
+            A = (byte)result;
+            SetZeroNeg(A);
+        }
+
+        public static void SBC(byte val, ushort adr)
+        {
+            short result = (short)(A - val - Convert.ToByte(!carry_flag));
+            overflow_flag = (A & 0x80) != (result & 0x80);
+            carry_flag = (result < 0x00);
+            A = (byte)result;
+            SetZeroNeg(A);
+        }
+
 	// Носорев Николай
         /// <summary>
         /// Программное прерывание

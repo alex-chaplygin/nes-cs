@@ -147,5 +147,59 @@ namespace NESTest
             Assert.AreEqual(true, CPU.zero_flag);
             Assert.AreEqual(false, CPU.negative_flag);
         }
+
+	[TestMethod]
+        public void ADCTest()
+        {
+            ushort adr = 0x12;
+            CPU.A = 0;
+            CPU.ADC(0x05, adr);
+            Assert.AreEqual(5, CPU.A);
+            
+            CPU.carry_flag = true;
+            CPU.ADC(0x03, adr);
+            Assert.AreEqual(0x09, CPU.A);
+            
+            CPU.carry_flag = false;
+            CPU.ADC(0xFF, adr);
+            Assert.AreEqual(0x08, CPU.A);
+            Assert.IsTrue(CPU.carry_flag);
+
+            CPU.A = 0;
+            CPU.ADC(0x80, adr);
+            Assert.IsTrue(CPU.overflow_flag);
+
+            CPU.A = 0;
+            CPU.ADC(0x0F, adr);
+            Assert.IsTrue(!CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void SBCTest()
+        {
+            ushort adr = 0x12;
+            CPU.A = 0xFF;
+            CPU.SBC(0x0F, adr);
+            Assert.AreEqual(0xEF, CPU.A);
+
+            CPU.carry_flag = true;
+            CPU.A = 0xFF;
+            CPU.SBC(0x0F, adr);
+            Assert.AreEqual(0xF0, CPU.A);
+
+            CPU.carry_flag = false;
+            CPU.A = 0x00;
+            CPU.SBC(0x01, adr);
+            Assert.AreEqual(0xFE, CPU.A);
+            Assert.IsTrue(CPU.carry_flag);
+
+            CPU.A = 0;
+            CPU.SBC(0x80, adr);
+            Assert.IsTrue(CPU.overflow_flag);
+
+            CPU.A = 0xFF;
+            CPU.SBC(0x00, adr);
+            Assert.IsTrue(!CPU.overflow_flag);
+        }
     }
 }
