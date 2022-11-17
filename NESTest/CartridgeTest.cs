@@ -1,4 +1,5 @@
 ﻿using NES;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NESTest {
     [TestClass]
