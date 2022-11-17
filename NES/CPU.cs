@@ -513,11 +513,17 @@ namespace NES
             return Memory.Read(adr);
         }
 
+        /// <summary>
+        /// Режим адресации - аккумулятор
+        /// </summary>
         static byte Accumulator(ref ushort adr)
         {
             return A;
         }
 
+        /// <summary>
+        /// Режим адресации - относительная
+        /// </summary>
         static byte Relative(ref ushort adr)
         {
             return Fetch();
@@ -577,18 +583,27 @@ namespace NES
             return Memory.Read(adr);
         }
 
+        /// <summary>
+        /// Режим адресации абсолютный по нулевой странице со смещением X
+        /// </summary>
         static byte ZeroX(ref ushort adr)
         {
             adr = (byte)(Fetch() + X);
             return Memory.Read(adr);
         }
 
+        /// <summary>
+        /// Режим адресации абсолютный по нулевой странице со смещением Y
+        /// </summary>
         static byte ZeroY(ref ushort adr)
         {
             adr = (byte)(Fetch() + Y);
             return Memory.Read(adr);
         }
 
+        /// <summary>
+        /// Режим адресации - косвенный
+        /// </summary>
         static byte Indirect(ref ushort adr)
         {
             adr = ToWord(Fetch(), Fetch());
@@ -609,6 +624,9 @@ namespace NES
             return Memory.Read(adr);
         }
 
+        /// <summary>
+        /// Режим адресации косвенный со смещением Y
+        /// </summary>
         static byte IndirectY(ref ushort adr)
         {
             adr = Fetch();
@@ -652,7 +670,7 @@ namespace NES
         static void BRK(byte val, ushort adr) 
         {
             break_flag = true;
-	        Interrupt(Interruption.IRQ);
+	    Interrupt(Interruption.IRQ);
         }
 
 
@@ -701,26 +719,6 @@ namespace NES
 
         }
 
-        static void PHP(byte val, ushort adr)
-        {
-
-        }
-
-        static void STA(byte val, ushort adr)
-        {
-
-        }
-
-        static void STY(byte val, ushort adr)
-        {
-
-        }
-
-        static void STX(byte val, ushort adr)
-        {
-
-        }
-
         static void TXA(byte val, ushort adr)
         {
 
@@ -732,21 +730,6 @@ namespace NES
         }
 
         static void TYA(byte val, ushort adr)
-        {
-
-        }
-
-        static void LDA(byte val, ushort adr)
-        {
-
-        }
-
-        static void LDX(byte val, ushort adr)
-        {
-
-        }
-
-        static void LDY(byte val, ushort adr)
         {
 
         }
@@ -766,15 +749,6 @@ namespace NES
 
         }
 
-        static void CLD(byte val, ushort adr)
-        {
-
-        }
-
-        static void NOP(byte val, ushort adr)
-        {
-
-        }
 
         // Малышев Максим
         /// <summary>
@@ -974,6 +948,14 @@ namespace NES
             carry_flag = false;
         }
 
+	/// <summary>
+        /// Очищает флаг десятичного режима
+        /// </summary>
+        static void CLD(byte val, ushort adr)
+        {
+            decimal_flag = false;
+        }
+	
         /// <summary>
         /// Очищает флаг десятичного режима
         /// </summary>
@@ -1101,6 +1083,49 @@ namespace NES
         }
 
 	/// <summary>
+        /// Выгружает регистр аккумулятора из памяти
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void LDA(byte val, ushort adr)
+        {
+            A = Memory.Read(adr);
+            add_cycle = Convert.ToInt32(cross);
+            SetZeroNeg(A);
+        }
+
+        /// <summary>
+        /// Выгружает индесный регистр X из памяти
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void LDX(byte val, ushort adr)
+        {
+            X = Memory.Read(adr);
+            add_cycle = Convert.ToInt32(cross);
+            SetZeroNeg(X);
+        }
+
+        /// <summary>
+        /// Выгружает индесный регистр Y из памяти
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void LDY(byte val, ushort adr)
+        {
+            Y = Memory.Read(adr);
+            add_cycle = Convert.ToInt32(cross);
+            SetZeroNeg(Y);
+        }        
+
+        /// <summary>
+        /// Пустая операция
+        /// </summary>
+        static void NOP(byte val, ushort adr)
+        {
+        }
+	
+	/// <summary>
         /// Установить флаг переноса
         /// </summary>
         /// <param name="val"></param>
@@ -1128,6 +1153,46 @@ namespace NES
         static void SEI(byte val, ushort adr)
         {
             interrupt_flag = true;
+        }
+
+	/// <summary>
+        /// Сохраняет регистр аккумулятора в память
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void STA(byte val, ushort adr)
+        {
+            Memory.Write(adr, A);
+        }
+
+        /// <summary>
+        /// Сохраняет индексный регистр X в память
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void STX(byte val, ushort adr)
+        {
+            Memory.Write(adr, X);
+        }
+
+        /// <summary>
+        /// Сохраняет индексный регистр Y в память
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void STY(byte val, ushort adr)
+        {
+            Memory.Write(adr, Y);
+        }
+
+	//Подушкин Иван
+        /// <summary>
+        /// Соединить флаги в байт и записать в стек
+        /// </summary>
+        static void PHP(byte val, ushort adr)
+        {
+	    break_flag = true;
+            Push(AssembleFlags());
         }
 	
 	/// <summary>
