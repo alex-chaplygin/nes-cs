@@ -96,6 +96,11 @@ namespace NES
         /// </summary>
         static bool cross;
 
+	/// <summary>
+        /// Флаг аккумуляторной адресации
+        /// </summary>
+        static bool is_accum;
+	
         /// <summary>
         /// Функция команды 
         /// </summary>
@@ -470,6 +475,20 @@ namespace NES
 			  Convert.ToByte(overflow_flag) << 6 | Convert.ToByte(negative_flag) << 7);
         }
 
+	/// <summary>
+        ///   Получить флаги из байта.
+        /// </summary>
+        static void DisassembleFlags(byte val)
+        {
+            carry_flag = (val & 1) > 0;
+            zero_flag = (val & 2) > 0;
+            interrupt_flag = (val & 4) > 0;
+            decimal_flag = (val & 8) > 0;
+            break_flag = (val & 16) > 0;
+            overflow_flag = (val & 64) > 0;
+            negative_flag = (val & 128) > 0;
+        }
+
         /// <summary>
         /// Загрузить очередной байт из памяти
         /// </summary>
@@ -518,6 +537,7 @@ namespace NES
         /// </summary>
         static byte Accumulator(ref ushort adr)
         {
+	    is_accum = true;
             return A;
         }
 
@@ -642,9 +662,10 @@ namespace NES
             throw new Exception($"Вызвана несуществующая команда: {Memory.Read((ushort)(PC - 1)):X}");
         }
 
-	//сложить аккумулятор с флагом переноса и с операндом и записать в аккумулятор
-        //флаг переполнения устанавливается когда изменился знак в результате сложения у акк был знак  а в результате получился знак другой знак это 7 бит
-        //дома тест
+        /// <summary>
+	/// сложить аккумулятор с флагом переноса и с операндом и записать в аккумулятор
+        /// флаг переполнения устанавливается когда изменился знак в результате сложения у акк был знак  а в результате получился знак другой знак это 7 бит
+        /// </summary>
         public static void ADC(byte val, ushort adr)
         {
             ushort result = (ushort)(A + val + Convert.ToByte(carry_flag));
@@ -654,6 +675,12 @@ namespace NES
             SetZeroNeg(A);
         }
 
+	/// <summary>
+        /// Вычесть память из аккумулятора с отрицательным переносом.
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        /// <returns></returns>
         public static void SBC(byte val, ushort adr)
         {
             short result = (short)(A - val - Convert.ToByte(!carry_flag));
@@ -679,24 +706,46 @@ namespace NES
 
         }
 
+	/// <summary>
+        /// Циклический сдвиг влево
+        /// </summary
         static void ROL(byte val, ushort adr)
         {
-
+            int b = (val << 1) + Convert.ToByte(carry_flag);
+            carry_flag = ((b >> 8) == 1);                      
+            SetZeroNeg((byte)b);
+            if (!is_accum) 
+                Memory.Write(adr, (byte)b);
+            else 
+                A = (byte)b;
         }
 
-        static void PLP(byte val, ushort adr)
+	/// <summary>
+        /// Циклический сдвиг вправо
+        /// </summary
+        static void ROR(byte val, ushort adr)
         {
-
+            int b = (byte)((val >> 1) + (Convert.ToByte(carry_flag) << 7));
+            carry_flag = ((val & 1) == 1);
+            SetZeroNeg((byte)b);
+            if (!is_accum)
+		Memory.Write(adr, (byte)b);
+            else
+		A = (byte)b;
         }
-
-        static void RTI(byte val, ushort adr)
-        {
-
-        }
-
+	
+        /// <summary>
+        /// Логический сдвиг вправо
+        /// </summary
         static void LSR(byte val, ushort adr)
         {
-
+            int b = (byte)(Memory.Read(adr) >> 1);
+            carry_flag = (val & 1) == 1;
+            SetZeroNeg((byte)b);
+            if (!is_accum)
+		Memory.Write(adr, (byte)b);
+            else
+		A = (byte)b;
         }
 
         static void PHA(byte val, ushort adr)
@@ -709,46 +758,10 @@ namespace NES
 
         }
 
-        static void ROR(byte val, ushort adr)
-        {
-
-        }
-
         static void PLA(byte val, ushort adr)
         {
 
         }
-
-        static void TXA(byte val, ushort adr)
-        {
-
-        }
-
-        static void TXS(byte val, ushort adr)
-        {
-
-        }
-
-        static void TYA(byte val, ushort adr)
-        {
-
-        }
-
-        static void TAX(byte val, ushort adr)
-        {
-
-        }
-
-        static void TAY(byte val, ushort adr)
-        {
-
-        }
-
-        static void TSX(byte val, ushort adr)
-        {
-
-        }
-
 
         // Малышев Максим
         /// <summary>
@@ -1194,6 +1207,76 @@ namespace NES
 	    break_flag = true;
             Push(AssembleFlags());
         }
+
+	/// <summary>
+        ///   Перенос A в X
+        /// </summary>
+        public static void TAX(byte val, ushort adr)
+        {
+            X = A;
+            SetZeroNeg(X);
+        }
+
+        /// <summary>
+        ///   Перенос A в Y
+        /// </summary>
+        public static void TAY(byte val, ushort adr)
+        {
+            Y = A;
+            SetZeroNeg(Y);
+        }
+
+        /// <summary>
+        ///   Перенос SP в X
+        /// </summary>
+        public static void TSX(byte val, ushort adr)
+        {
+            X = SP;
+            SetZeroNeg(X);
+        }
+
+        /// <summary>
+        ///   Перенос X в A
+        /// </summary>
+        public static void TXA(byte val, ushort adr)
+        {
+            A = X;
+            SetZeroNeg(A);
+        }
+
+        /// <summary>
+        ///   Перенос Y в A
+        /// </summary>
+        public static void TYA(byte val, ushort adr)
+        {
+            A = Y;
+            SetZeroNeg(A);
+        }
+
+        /// <summary>
+        ///   Перенос X в SP
+        /// </summary>
+        public static void TXS(byte val, ushort adr)
+        {
+            SP = X;
+        }
+
+        /// <summary>
+        ///   Восстановить флаги.
+        /// </summary>
+        public static void PLP(byte val, ushort adr)
+        {
+            DisassembleFlags(Pop());
+        }
+
+        /// <summary>
+        ///   Возврат из прерывания.
+        /// </summary>
+        public static void RTI(byte val, ushort adr)
+        {
+            PLP(val, adr);
+            PC = PopWord();
+        }
 	
 	/// <summary>
 	///   Сигнал прерывания
@@ -1216,15 +1299,16 @@ namespace NES
 	/// <summary>
         ///   Шаг процессора
         /// </summary>
-       public static int Step()
+	public static int Step()
         {
             ushort operandAddr = 0;
             add_cycle = 0;
             cross = false;
+	    is_accum = false;
             byte command = Fetch();
-	        byte operandVal = table[command].adrMode(ref operandAddr);
+	    byte operandVal = table[command].adrMode(ref operandAddr);
             table[command].op(operandVal,operandAddr);
-	        return table[command].cycles + add_cycle;
+	    return table[command].cycles + add_cycle;
         }
     }
 }
