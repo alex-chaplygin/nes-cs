@@ -650,8 +650,10 @@ namespace NES
         static byte IndirectY(ref ushort adr)
         {
             adr = Fetch();
-            adr = Memory.ReadWord((ushort)(adr & 0xFF));
-            return (byte)(Memory.Read(adr) + Y);
+            adr = Memory.ReadWord(adr);
+            cross = IsCross(adr, Y);
+            adr = (ushort)(adr + Y);
+            return Memory.Read(adr);
         }
 
         /// <summary>
@@ -749,11 +751,6 @@ namespace NES
         }
 
         static void PHA(byte val, ushort adr)
-        {
-
-        }
-
-        static void RTS(byte val, ushort adr)
         {
 
         }
@@ -1166,6 +1163,16 @@ namespace NES
         static void SEI(byte val, ushort adr)
         {
             interrupt_flag = true;
+        }
+
+        /// <summary>
+        /// Возврат из подпрограммы
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="adr"></param>
+        static void RTS(byte val, ushort adr)
+        {
+            PC = PopWord();
         }
 
 	/// <summary>
