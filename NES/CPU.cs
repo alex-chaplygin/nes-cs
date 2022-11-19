@@ -16,6 +16,7 @@ namespace NES
     public enum Interruption
     {
             IRQ = 0xFFFE, // ввод-вывод
+            BRK = 0xFFFE, // программное прерывание
             NMI = 0xFFFA, // немаскируемое - видео
             RESET = 0xFFFC, // сброс в начальное состояние
     }
@@ -699,7 +700,7 @@ namespace NES
         static void BRK(byte val, ushort adr) 
         {
             break_flag = true;
-	    Interrupt(Interruption.IRQ);
+	    Interrupt(Interruption.BRK);
         }
 
 
@@ -750,14 +751,21 @@ namespace NES
 		A = (byte)b;
         }
 
+        /// <summary>
+        /// Сохранить аккумулятор
+        /// </summary>
         static void PHA(byte val, ushort adr)
         {
-
+	    Push(A);
         }
 
+        /// <summary>
+        /// Восстановить аккумулятор
+        /// </summary>
         static void PLA(byte val, ushort adr)
         {
-
+	    A = Pop();
+	    SetZeroNeg(A);
         }
 
         // Малышев Максим
