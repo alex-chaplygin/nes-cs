@@ -19,7 +19,7 @@ namespace NES
 	/// <summary>
         /// Память видеопроцессора
         /// </summary>
-        public static byte[] ppu_memory = new byte[PPU_MEM_SIZE];
+        public static byte[] memory = new byte[PPU_MEM_SIZE];
 
 	/// <summary>
 	///   Регистр адреса
@@ -30,6 +30,8 @@ namespace NES
 	///   Первая запись в адрес
 	/// </summary>
         static bool isFirst = true;
+
+	public static int increment;
 	
 	/// <summary>
 	///   Запись в регистр PPU
@@ -65,13 +67,35 @@ namespace NES
             }
         }
 
-	        /// <summary>
+	/// <summary>
+	/// Увеличить адрес, если increment=0, то на 1; если increment=1, то на 32
+	/// </summary>
+	/// <param name="adr"></param>
+	static void IncreaseAddress ()
+	{
+	    if (increment == 0)
+		address++;
+	    else if (increment == 1)
+		address += 32;
+	}
+	
+	/// <summary>
+	/// Записать в память байт по адресу
+	/// </summary>
+	/// <param name="bt"></param>
+	public static void WriteData (byte bt)
+	{
+	    memory[address] = bt;
+	    IncreaseAddress();
+	} 
+
+	/// <summary>
         /// Записать таблицу шаблонов 0
         /// </summary>
         /// <param name="data">Данные шаблонов</param>
         public static void WritePattern0(byte[] data)
         {
-            data.CopyTo(ppu_memory, PATTERN_TABLE_0);
+            data.CopyTo(memory, PATTERN_TABLE_0);
         }
 
         /// <summary>
@@ -80,7 +104,7 @@ namespace NES
         /// <param name="data">Данные шаблонов</param>
         public static void WritePattern1 (byte[] data)
         {
-            data.CopyTo(ppu_memory, PATTERN_TABLE_1);
+            data.CopyTo(memory, PATTERN_TABLE_1);
         }
     }
 }

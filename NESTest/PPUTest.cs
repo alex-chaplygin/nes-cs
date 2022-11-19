@@ -57,5 +57,21 @@ namespace NESTest
             PPU.WritePattern0(data);
             Assert.AreEqual(3, PPU.ppu_memory[0x2000 - 1]);
         }
+
+	[TestMethod]
+	public void Test1_WriteData()
+	{
+	    PPU.increment = 0;
+	    PPU.WriteData(5);
+	    Assert.AreEqual(1, PPU.address);
+	}
+	
+	[TestMethod]
+	public void Test2_WriteData()
+	{
+	    PPU.increment = 1;
+	    PPU.WriteData(5);
+	    Assert.AreEqual(32, PPU.address) ;
+	}
     }
 }
