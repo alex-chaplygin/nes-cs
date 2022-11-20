@@ -435,8 +435,8 @@ namespace NES
 	/// </summary>
         public static void PushWord(ushort val)
         {
-            Push((byte)(val & 0x00FF));
             Push((byte)(val >> 8));
+            Push((byte)(val & 0x00FF));
         }
 
 	/// <summary>
@@ -460,8 +460,8 @@ namespace NES
 	/// </summary>
         public static ushort PopWord()
 	{
-	    byte h = Pop();
 	    byte l = Pop();
+	    byte h = Pop();
             return ToWord(l, h);
         }
 
