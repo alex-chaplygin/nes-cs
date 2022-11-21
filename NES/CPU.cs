@@ -1073,7 +1073,7 @@ namespace NES
         /// </summary>
         static void JSR(byte val, ushort adr)
         {
-            PushWord(PC);
+            PushWord(PC - 1);
             PC = adr;
         }
 	
@@ -1180,7 +1180,7 @@ namespace NES
         /// <param name="adr"></param>
         static void RTS(byte val, ushort adr)
         {
-            PC = PopWord();
+            PC = PopWord() + 1;
         }
 
 	/// <summary>
