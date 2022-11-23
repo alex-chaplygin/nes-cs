@@ -27,6 +27,11 @@ namespace NES
 	public static ushort address;
 
 	/// <summary>
+        /// Регистр позиции прокрутки ППУ
+        /// </summary>
+        public static ushort scroll;
+
+	/// <summary>
 	///   Первая запись в адрес
 	/// </summary>
         static bool isFirst = true;
@@ -90,6 +95,15 @@ namespace NES
 	} 
 
 	/// <summary>
+	/// Прочитать из памяти байт по адресу
+	/// </summary>
+	/// <param name="bt"></param>
+	static byte ReadData ()
+	{
+	    return 0;
+	} 
+	
+	/// <summary>
         /// Записать таблицу шаблонов 0
         /// </summary>
         /// <param name="data">Данные шаблонов</param>
@@ -105,6 +119,27 @@ namespace NES
         public static void WritePattern1 (byte[] data)
         {
             data.CopyTo(memory, PATTERN_TABLE_1);
+        }
+
+	// Акименко Максим 
+        /// <summary>
+        /// первый раз старший байт регистра прокрутки второй младший байт регистра прокрутки
+        /// </summary>
+        /// <param name="val">старший или младший байт</param>
+        static void SetScroll(byte val)
+        {
+            if (isFirst)
+            {
+                scroll = (ushort)(scroll & 0xFF);
+                scroll = (ushort)(scroll | val<<8);
+                isFirst = false;
+            }
+            else
+            {
+                scroll = (ushort)(scroll & 0xFF00);
+                scroll = (ushort)(scroll | val);
+                isFirst = true;
+            }
         }
     }
 }
