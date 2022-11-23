@@ -234,5 +234,65 @@ namespace NESTest
             Assert.AreEqual(0xAA, val);
             Assert.AreEqual(0x8200, adr);
         }
+
+	[TestMethod]
+       public void BITTest1()
+        {
+            CPU.A = 0xFF;
+            CPU.BIT(0x11, 0);
+            Assert.AreEqual(false, CPU.zero_flag);
+            Assert.AreEqual(false, CPU.negative_flag);
+            Assert.AreEqual(false, CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void BITTest2()
+        {
+            CPU.A = 0xFF;
+            CPU.BIT(0x00, 0);
+            Assert.AreEqual(true, CPU.zero_flag);
+            Assert.AreEqual(false, CPU.negative_flag);
+            Assert.AreEqual(false, CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void BITTest3()
+        {
+            CPU.A = 0xFF;
+            CPU.BIT(0x88, 0);
+            Assert.AreEqual(false, CPU.zero_flag);
+            Assert.AreEqual(true, CPU.negative_flag);
+            Assert.AreEqual(false, CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void BITTest4()
+        {
+            CPU.A = 0xFF;
+            CPU.BIT(0x44, 0);
+            Assert.AreEqual(false, CPU.zero_flag);
+            Assert.AreEqual(false, CPU.negative_flag);
+            Assert.AreEqual(true, CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void BITTest5()
+        {
+            CPU.A = 0x00;
+            CPU.BIT(0x11, 0);
+            Assert.AreEqual(true, CPU.zero_flag);
+            Assert.AreEqual(false, CPU.negative_flag);
+            Assert.AreEqual(false, CPU.overflow_flag);
+        }
+
+        [TestMethod]
+        public void BITTest6()
+        {
+            CPU.A = 0xFF;
+            CPU.BIT(0xC0, 0);
+            Assert.AreEqual(false, CPU.zero_flag);
+            Assert.AreEqual(true, CPU.negative_flag);
+            Assert.AreEqual(true, CPU.overflow_flag);
+        }
     }
 }

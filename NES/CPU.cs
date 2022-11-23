@@ -704,9 +704,19 @@ namespace NES
         }
 
 
-        static void BIT(byte val, ushort adr)
+	/// <summary>
+        /// Побитовое И аккумулятора с операндом, в зависимости от результата устанавливается флаг нуля.
+        /// Седьмой бит операнда заносится в флаг знака (отрицательного результата).
+        /// Шестой бит заносится в флаг переполнения.
+        /// </summary>
+        /// <param name="val">операнд</param>
+        /// <param name="adr"></param>
+        public static void BIT(byte val, ushort adr)
         {
-
+            byte opperandA = (byte)(val & A);
+            zero_flag = opperandA == 0;
+            negative_flag = (val & 0x80) == 0x80;
+            overflow_flag = (val & 0x40) == 0x40;
         }
 
 	/// <summary>
@@ -1073,7 +1083,7 @@ namespace NES
         /// </summary>
         static void JSR(byte val, ushort adr)
         {
-            PushWord(PC - 1);
+            PushWord((ushort)(PC - 1));
             PC = adr;
         }
 	
@@ -1180,7 +1190,7 @@ namespace NES
         /// <param name="adr"></param>
         static void RTS(byte val, ushort adr)
         {
-            PC = PopWord() + 1;
+            PC = (ushort)(PopWord() + 1);
         }
 
 	/// <summary>
