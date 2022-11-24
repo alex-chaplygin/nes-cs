@@ -87,13 +87,73 @@ namespace NES
 	///   Первая запись в адрес
 	/// </summary>
         static bool isFirst = true;
+
+	/// <summary>
+        /// Функция чтения из памяти
+        /// </summary>
+        /// <returns></returns>
+        delegate byte MemoryRead();
+
+        /// <summary>
+        /// Функция записи в память
+        /// </summary>
+        /// <param name="value">Значение, записываемое в память</param>
+        delegate void MemoryWrite(byte value);
+
+        struct Register
+        {
+            /// <summary>
+            /// Адрес
+            /// </summary>
+            public int adr;
+
+            /// <summary>
+            ///   Функция чтения
+            /// </summary>
+            public MemoryRead read;
+
+            /// <summary>
+            ///   Функция записи
+            /// </summary>
+            public MemoryWrite write;
+
+            public Register(int a, MemoryRead r, MemoryWrite w)
+            {
+                adr = a;
+                read = r;
+                write = w;
+            }
+        }
+
+        static Register[] memoryTable = new Register[]
+        {
+            new Register( 0x2000, null, ControllerWrite ),
+	    //            new Register( 0x2001, null, MaskWrite ),
+            //new Register( 0x2002, StatusRead, null ),
+            //new Register( 0x2003, null, OAMadrWrite ),
+            //new Register( 0x2004, OAMdataRead, OAMdataWrite ),
+            new Register( 0x2005, null, SetScroll ),
+            new Register( 0x2006, null, SetAddress ),
+            new Register( 0x2007, DataRead, DataWrite ),
+            /*new Register( 0x4014, null, DMA )  */ 
+        };
 	
 	/// <summary>
 	///   Запись в регистр PPU
 	/// </summary>
         public static void Write(ushort adr, byte value)
         {
-
+	    for(int i = 0; i < memoryTable.Length; i++)
+                if (adr == memoryTable[i].adr)
+                {
+                    if (memoryTable[i].write == null)
+                        return;
+                    else
+                    {
+                        memoryTable[i].write(value);
+                        return;
+                    }
+                }
         }
 
 	/// <summary>
@@ -101,6 +161,16 @@ namespace NES
 	/// </summary>
         public static byte Read(ushort adr)
         {
+	    for (int i = 0; i < memoryTable.Length; i++)
+                if (adr == memoryTable[i].adr)
+                {
+                    if (memoryTable[i].read == null)
+                        return 0;
+                    else
+                    {
+                        return memoryTable[i].read();
+                    }
+                }
             return 0;
         }
 
@@ -138,7 +208,7 @@ namespace NES
 	/// Записать в память байт по адресу
 	/// </summary>
 	/// <param name="bt"></param>
-	public static void WriteData (byte bt)
+	public static void DataWrite (byte bt)
 	{
 	    memory[address] = bt;
 	    IncreaseAddress();
@@ -148,7 +218,7 @@ namespace NES
 	/// Прочитать из памяти байт по адресу
 	/// </summary>
 	/// <param name="bt"></param>
-	static byte ReadData ()
+	static byte DataRead ()
 	{
 	    return 0;
 	} 
@@ -204,6 +274,21 @@ namespace NES
             background_table = (val >> 4) & 1;
             sprite_size = (val >> 5) & 1;            
             generate_nmi = ((val >> 7) & 1) > 0;
+        }
+
+	/// <summary>
+        /// Вычисляет настоящий адрес на основе зеркалированного адреса
+        /// </summary>
+        /// <param name="adr">Зеркалированный адрес</param>
+        /// <returns>Настоящий адрес</returns>
+        public static ushort MirrorAdr(ushort adr)
+        {
+            if (Cartridge.mirroring == Mirroring.Horisontal)
+            {
+                if (((adr >= 0x2400) && (adr < 0x2800)) || (adr >= 0x2C00))
+                    adr -= 0x400;
+            }
+            return adr;
         }
 
         /// <summary>
