@@ -7,9 +7,14 @@ using System.IO;
 
 namespace NES
 {
+    /// <summary>
+    /// Вид зеркалирования
+    /// </summary>
     public enum Mirroring {
-        Horisontal,
-        Vertical
+        Horisontal, //горизонтальное
+        Vertical, //вертикальное
+	Single,  //один экран
+        FourScreen //четыре экрана
     }
 
     /// <summary>
@@ -110,10 +115,13 @@ namespace NES
                             return false;
                     prg_count = header[4];
                     chr_count = header[5];
-                    mirroring = (Mirroring)(header[6] & 0x01);
+                    ignore_mirroring = (header[6] & 0x08) != 0;
+		    if (ignore_mirroring)
+                        mirroring = Mirroring.FourScreen;
+                    else
+                        mirroring = (Mirroring)(header[6] & 0x01);
                     prg_ram = (header[6] & 0x02) != 0;
                     trainer = (header[6] & 0x04) != 0;
-                    ignore_mirroring = (header[6] & 0x08) != 0;
                     trainer_mem = reader.ReadBytes(trainer ? 512 : 0);
                     prg_mem = reader.ReadBytes(prg_count * Memory.PRG_SIZE);
                     chr_mem = reader.ReadBytes(chr_count * Memory.CHR_SIZE);
