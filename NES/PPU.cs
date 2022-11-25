@@ -41,8 +41,16 @@ namespace NES
             236, 238, 236, 168, 204, 236, 188, 188, 236, 212, 178, 236, 236, 174, 236, 236, 174, 212, 236, 180, 176, 228, 196, 144, 204, 210, 120, 180, 222, 120, 168, 226, 144, 152, 226, 180, 160, 214, 228, 160, 162, 160
         };
 
-        public static byte[] screen = new byte[WIDTH * HEIGHT * 3];
+        /// <summary>
+        /// Массив точек экрана
+        /// </summary>
+	public static byte[] screen = new byte[WIDTH * HEIGHT * 3];
 
+	/// <summary>
+        /// позиция в массиве экрана
+        /// </summary>
+        public static int screen_pos;
+	
         /// <summary>
         /// Номер экрана
         /// </summary>
@@ -73,6 +81,46 @@ namespace NES
         /// </summary>
         public static bool generate_nmi;
 
+	/// <summary>
+        /// Если 0, то обычные цвета, если 1 то изображение становится чёрн-белым
+        /// </summary>
+        public static bool greyscale;
+
+        /// <summary>
+        /// Если 1, то задний фон показывается в самых левых 8 пикселях, если 0, то спрятан
+        /// </summary>
+        public static bool show_8_background;
+
+        /// <summary>
+        /// Если 1, то спрайты показываются в самых левых 8 пикселях, если 0, то спрятаны
+        /// </summary>
+        public static bool show_8_sprites;
+
+        /// <summary>
+        /// Если 1, то задний фон показывается, если 0, то нет
+        /// </summary>
+        public static bool show_background;
+
+        /// <summary>
+        /// Если 1, то спрайты показываются, если 0, то нет
+        /// </summary>
+        public static bool show_sprites;
+
+        /// <summary>
+        /// Если 0, то цвет теряет значение красного (= 0), если 1, то ничего
+        /// </summary>
+        public static bool red_available;
+
+        /// <summary>
+        /// Если 0, то цвет теряет значение зеленого (= 0), если 1, то ничего
+        /// </summary>
+        public static bool green_available;
+
+        /// <summary>
+        /// Если 0, то цвет теряет значение синего (= 0), если 1, то ничего
+        /// </summary>
+        public static bool blue_available;
+	
 	/// <summary>
 	///   Регистр адреса
 	/// </summary>
@@ -291,6 +339,22 @@ namespace NES
             return adr;
         }
 
+	/// <summary>
+        /// Извлечь значения маски PPU
+        /// </summary>
+        /// <param name="val">значение</param>
+        public static void MaskWrite(byte val)
+        {
+            greyscale = (val & 1) > 0;
+            show_8_background = ((val >> 1) & 1) > 0;
+            show_8_sprites = ((val >> 2) & 1) > 0;
+            show_background = ((val >> 3) & 1) > 0;
+            show_sprites = ((val >> 4) & 1) > 0;
+            red_available = ((val >> 5) & 1) > 0;
+            green_available = ((val >> 6) & 1) > 0;
+            blue_available = ((val >> 7) & 1) > 0;
+        }
+
         /// <summary>
         /// Вычислить адрес, где хранятся данные строчки тайла
         /// </summary>
@@ -302,6 +366,34 @@ namespace NES
         {
             
             return 0;
+        }
+
+        /// <summary>
+        /// Отрисовать очередной пиксель
+        /// </summary>
+        /// <param name="value">Номер цвета палитры</param>
+        static void RenderPixel(int value)
+        {
+            if(greyscale)
+                value &= 0x30;
+            screen[screen_pos] = blue_available  ? palette[value * 3 + 2] : (byte)0;
+            screen[screen_pos + 1] = green_available ? palette[value * 3 + 1] : (byte)0;
+            screen[screen_pos + 2] = red_available ? palette[value * 3] : (byte)0;
+            screen_pos += 3;
+        }
+        
+        public static byte[] GetScreen()
+        {
+            screen_pos = 0;
+            int tile = 0;
+	    //            BeginFrame();
+
+            for (int i = 0; i < HEIGHT; i++)
+                for (int j = 0; j < WIDTH; j++)
+                {
+                    RenderPixel(j / 4);
+                }
+            return screen;            
         }
     }
 }
