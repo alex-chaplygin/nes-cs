@@ -100,5 +100,19 @@ namespace NESTest
             Assert.AreEqual(0x2BFF, PPU.MirrorAdr(0x2FFF));
             Assert.AreEqual(0x3F00, PPU.MirrorAdr(0x3F00));
         }
+
+	[TestMethod]
+        public void Test_ReadData()
+        {
+            PPU.increment = 0;
+            PPU.WriteData(1);
+            PPU.WriteData(3);
+            PPU.WriteData(2);
+            PPU.address = 0;
+            Assert.AreEqual(0, PPU.ReadData());
+            Assert.AreEqual(1, PPU.ReadData());
+            Assert.AreEqual(3, PPU.ReadData());
+            Assert.AreEqual(2, PPU.ReadData());
+        }
     }
 }

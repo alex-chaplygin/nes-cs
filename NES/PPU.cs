@@ -127,6 +127,11 @@ namespace NES
 	public static ushort address;
 
 	/// <summary>
+        /// Буффер памяти
+        /// </summary>
+        public static byte read_buffer;
+
+	/// <summary>
         /// Регистр позиции прокрутки ППУ
         /// </summary>
         public static ushort scroll;
@@ -176,7 +181,7 @@ namespace NES
         static Register[] memoryTable = new Register[]
         {
             new Register( 0x2000, null, ControllerWrite ),
-	    //            new Register( 0x2001, null, MaskWrite ),
+	    new Register( 0x2001, null, MaskWrite ),
             //new Register( 0x2002, StatusRead, null ),
             //new Register( 0x2003, null, OAMadrWrite ),
             //new Register( 0x2004, OAMdataRead, OAMdataWrite ),
@@ -268,7 +273,10 @@ namespace NES
 	/// <param name="bt"></param>
 	static byte DataRead ()
 	{
-	    return 0;
+	    byte b = read_buffer;
+            read_buffer = memory[address];
+            IncreaseAddress();
+            return b;
 	} 
 	
 	/// <summary>
