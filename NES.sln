@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NES", "NES\NES.csproj", "{C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NESTest", "NESTest\NESTest.csproj", "{A6CEAA89-ED04-43D1-93FE-C714583842BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTest", "VideoTest\VideoTest.csproj", "{CBEABC41-92CA-40ED-9921-7DA003E47D95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,14 @@ Global
 		{C5656D31-4F41-40BD-9E63-0D661D858070}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5656D31-4F41-40BD-9E63-0D661D858070}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5656D31-4F41-40BD-9E63-0D661D858070}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6CEAA89-ED04-43D1-93FE-C714583842BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6CEAA89-ED04-43D1-93FE-C714583842BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6CEAA89-ED04-43D1-93FE-C714583842BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6CEAA89-ED04-43D1-93FE-C714583842BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBEABC41-92CA-40ED-9921-7DA003E47D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBEABC41-92CA-40ED-9921-7DA003E47D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBEABC41-92CA-40ED-9921-7DA003E47D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBEABC41-92CA-40ED-9921-7DA003E47D95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
