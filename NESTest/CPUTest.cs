@@ -168,11 +168,19 @@ namespace NESTest
 
             CPU.A = 0;
             CPU.ADC(0x80, adr);
-            Assert.IsTrue(CPU.overflow_flag);
+            Assert.IsTrue(!CPU.overflow_flag);
 
             CPU.A = 0;
             CPU.ADC(0x0F, adr);
             Assert.IsTrue(!CPU.overflow_flag);
+
+            CPU.A = 0x80;
+            CPU.ADC(0x80, adr);
+            Assert.IsTrue(CPU.overflow_flag);
+
+            CPU.A = 64;
+            CPU.ADC(64, adr);
+            Assert.IsTrue(CPU.overflow_flag);
         }
 
         [TestMethod]
@@ -196,11 +204,16 @@ namespace NESTest
 
             CPU.A = 0;
             CPU.SBC(0x80, adr);
-            Assert.IsTrue(CPU.overflow_flag);
+            Assert.IsTrue(!CPU.overflow_flag);
 
             CPU.A = 0xFF;
             CPU.SBC(0x00, adr);
             Assert.IsTrue(!CPU.overflow_flag);
+
+            CPU.A = 0x80;
+            CPU.carry_flag = true;
+            CPU.SBC(0x80, adr);
+            Assert.IsTrue(CPU.overflow_flag);
         }
 
         [TestMethod]

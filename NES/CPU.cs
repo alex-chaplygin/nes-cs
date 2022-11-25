@@ -1,4 +1,4 @@
-﻿using NES;
+﻿﻿using NES;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -45,12 +45,12 @@ namespace NES
         /// <summary>
         /// Указатель команд
         /// </summary>
-	public static ushort PC;
+	    public static ushort PC;
 
         /// <summary>
         /// Указатель стека
         /// </summary>
-        public static byte SP = 0xFF;
+        public static byte SP;
 
         /// <summary>
         /// Флаг переноса
@@ -538,7 +538,7 @@ namespace NES
         /// </summary>
         static byte Accumulator(ref ushort adr)
         {
-	    is_accum = true;
+	        is_accum = true;
             return A;
         }
 
@@ -662,23 +662,25 @@ namespace NES
         /// </summary>
         static void NUL(byte val, ushort adr)
         {
-            throw new Exception($"Вызвана несуществующая команда: {Memory.Read((ushort)(PC - 1)):X}");
+            Console.Write("NUL");
+            throw new Exception($"Вызвана несуществующая команда: {Memory.Read((ushort)(PC - 1)):X}");            
         }
 
         /// <summary>
-	/// сложить аккумулятор с флагом переноса и с операндом и записать в аккумулятор
+        /// сложить аккумулятор с флагом переноса и с операндом и записать в аккумулятор
         /// флаг переполнения устанавливается когда изменился знак в результате сложения у акк был знак  а в результате получился знак другой знак это 7 бит
         /// </summary>
         public static void ADC(byte val, ushort adr)
         {
             ushort result = (ushort)(A + val + Convert.ToByte(carry_flag));
-            overflow_flag = (A & 0x80) != (result & 0x80);
+            overflow_flag = ((A & 0x80) != (result & 0x80)) && ((A & 0x80) == (val & 0x80));
             carry_flag = (result > 0xFF);
             A = (byte)result;
             SetZeroNeg(A);
+            Console.Write("ADC");
         }
 
-	/// <summary>
+        /// <summary>
         /// Вычесть память из аккумулятора с отрицательным переносом.
         /// </summary>
         /// <param name="val"></param>
@@ -686,21 +688,24 @@ namespace NES
         /// <returns></returns>
         public static void SBC(byte val, ushort adr)
         {
-            short result = (short)(A - val - Convert.ToByte(!carry_flag));
-            overflow_flag = (A & 0x80) != (result & 0x80);
-            carry_flag = (result < 0x00);
+            ushort result = (ushort)(A - val - Convert.ToByte(!carry_flag));
+            overflow_flag = ((A & 0x80) != (result & 0x80)) && ((A & 0x80) == (val & 0x80));
+            //overflow_flag = ((A ^ result) & (val ^ result) & 0x80) > 0;
+            carry_flag = (result & 0x100) == 0;
             A = (byte)result;
             SetZeroNeg(A);
+            Console.Write($"SBC val = {val:x4}");
         }
 
-	// Носорев Николай
+        // Носорев Николай
         /// <summary>
         /// Программное прерывание
         /// </summary>
         static void BRK(byte val, ushort adr) 
         {
             break_flag = true;
-	    Interrupt(Interruption.BRK);
+	        Interrupt(Interruption.BRK);
+            Console.Write("BRK");
         }
 
 
@@ -717,6 +722,7 @@ namespace NES
             zero_flag = opperandA == 0;
             negative_flag = (val & 0x80) == 0x80;
             overflow_flag = (val & 0x40) == 0x40;
+            Console.Write("BIT");
         }
 
 	/// <summary>
@@ -727,10 +733,9 @@ namespace NES
             int b = (val << 1) + Convert.ToByte(carry_flag);
             carry_flag = ((b >> 8) == 1);                      
             SetZeroNeg((byte)b);
-            if (!is_accum) 
-                Memory.Write(adr, (byte)b);
-            else 
-                A = (byte)b;
+            if (!is_accum) Memory.Write(adr, (byte)b);
+            else A = (byte)b;
+            Console.Write("ROL");
         }
 
 	/// <summary>
@@ -741,10 +746,9 @@ namespace NES
             int b = (byte)((val >> 1) + (Convert.ToByte(carry_flag) << 7));
             carry_flag = ((val & 1) == 1);
             SetZeroNeg((byte)b);
-            if (!is_accum)
-		Memory.Write(adr, (byte)b);
-            else
-		A = (byte)b;
+            if (!is_accum) Memory.Write(adr, (byte)b);
+            else A = (byte)b;
+            Console.Write("ROR");
         }
 	
         /// <summary>
@@ -752,13 +756,12 @@ namespace NES
         /// </summary
         static void LSR(byte val, ushort adr)
         {
-            int b = (byte)(Memory.Read(adr) >> 1);
+            int b = (byte)(val >> 1);
             carry_flag = (val & 1) == 1;
             SetZeroNeg((byte)b);
-            if (!is_accum)
-		Memory.Write(adr, (byte)b);
-            else
-		A = (byte)b;
+            if (!is_accum) Memory.Write(adr, (byte)b);
+            else A = (byte)b;
+            Console.Write("LSR");
         }
 
         /// <summary>
@@ -766,7 +769,8 @@ namespace NES
         /// </summary>
         static void PHA(byte val, ushort adr)
         {
-	    Push(A);
+	        Push(A);
+            Console.Write("PHA");
         }
 
         /// <summary>
@@ -774,8 +778,9 @@ namespace NES
         /// </summary>
         static void PLA(byte val, ushort adr)
         {
-	    A = Pop();
-	    SetZeroNeg(A);
+	        A = Pop();
+	        SetZeroNeg(A);
+            Console.Write("PLA");
         }
 
         // Малышев Максим
@@ -787,8 +792,9 @@ namespace NES
         static void AND(byte val, ushort adr)
         {
             A &= val;
-	    SetZeroNeg(A);
-	    add_cycle = Convert.ToInt32(cross);
+	        SetZeroNeg(A);
+	        add_cycle = Convert.ToInt32(cross);
+            Console.Write("AND");
         }
 
 	// Коваль Никита
@@ -801,7 +807,8 @@ namespace NES
         {
             carry_flag = (val >> 7) == 1;
             A = (byte)(val << 1);
-	    SetZeroNeg(A);
+	        SetZeroNeg(A);
+            Console.Write("ASL");
         }
 
 	/// <summary>
@@ -819,10 +826,11 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BCC");
         }
 
         /// <summary>
-        /// Переход, если флаш переноса установлен, указатель команд устанавливается на новый адрес
+        /// Переход, если флаг переноса установлен, указатель команд устанавливается на новый адрес
         /// </summary>
         /// <param name="val">Смещение</param>
         /// <param name="adr"></param>        
@@ -835,7 +843,7 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
-            
+            Console.Write("BCS");
         }
 
         /// <summary>
@@ -852,6 +860,7 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BEQ");
         }
 
         /// <summary>
@@ -868,6 +877,7 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BMI");
         }
 
         /// <summary>
@@ -884,6 +894,7 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BNE");
         }
 
         /// <summary>
@@ -900,6 +911,7 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BPL");
         }
 
         /// <summary>
@@ -916,6 +928,7 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BVC");
         }
 
         /// <summary>
@@ -932,16 +945,19 @@ namespace NES
                 if (IsCross(PC, (char)val))
                     add_cycle++;
             }
+            Console.Write("BVS");
         }
 	
         /// <summary>
         /// Сравнение аккумулятора с операндом
         /// </summary>
 	static void CMP(byte val, ushort adr)
-        {   byte result = (byte)(A - val);
+        {   
+            int result = A - val;
             carry_flag = result >= 0;
-            SetZeroNeg(result);
+            SetZeroNeg((byte)result);
             add_cycle = cross ? 1 : 0;
+            Console.Write("CMP");
         }
 
         /// <summary>
@@ -949,10 +965,11 @@ namespace NES
         /// </summary>
         static void CPX(byte val, ushort adr)
         {
-            byte result = (byte)(X - val);
+            int result = X - val;
             carry_flag = result >= 0;
-            SetZeroNeg(result);
+            SetZeroNeg((byte)result);
             add_cycle = cross ? 1 : 0;
+            Console.Write("CPX");
         }
 
         /// <summary>
@@ -960,10 +977,11 @@ namespace NES
         /// </summary>
         static void CPY(byte val, ushort adr)
         {
-            byte result = (byte)(Y - val);
+            int result = Y - val;
             carry_flag = result >= 0;
-            SetZeroNeg(result);
+            SetZeroNeg((byte)result);
             add_cycle = cross ? 1 : 0;
+            Console.Write("CPY");
         }
 
 	/// <summary>
@@ -974,6 +992,7 @@ namespace NES
         static void CLC(byte val, ushort adr)
         {
             carry_flag = false;
+            Console.Write("CLC");
         }
 
 	/// <summary>
@@ -982,6 +1001,7 @@ namespace NES
         static void CLD(byte val, ushort adr)
         {
             decimal_flag = false;
+            Console.Write("CLD");
         }
 	
         /// <summary>
@@ -992,6 +1012,7 @@ namespace NES
         static void CLВ(byte val, ushort adr)
         {
             decimal_flag = false;
+            Console.Write("CLB");
         }
 
         /// <summary>
@@ -1002,6 +1023,7 @@ namespace NES
         static void CLI(byte val, ushort adr)
         {
             interrupt_flag = false;
+            Console.Write("CLI");
         }
 
         /// <summary>
@@ -1012,6 +1034,7 @@ namespace NES
         static void CLV(byte val, ushort adr)
         {
             overflow_flag = false;
+            Console.Write("CLV");
         }
 	
         /// <summary>
@@ -1022,6 +1045,7 @@ namespace NES
             byte res = (byte)(val - 1);
             Memory.Write(adr, res);
             SetZeroNeg(res);
+            Console.Write("DEC");
         }
 	
         /// <summary>
@@ -1029,8 +1053,9 @@ namespace NES
         /// </summary>
         static void DEX(byte val, ushort adr)
         {
-	    X--;
+	        X--;
             SetZeroNeg(X);
+            Console.Write("DEX");
         }
 
         /// <summary>
@@ -1038,8 +1063,9 @@ namespace NES
         /// </summary>
         static void DEY(byte val, ushort adr)
         {
-	    Y--;
+	        Y--;
             SetZeroNeg(Y);
+            Console.Write("DEY");
         }
 	
         /// <summary>
@@ -1050,6 +1076,7 @@ namespace NES
             byte res = (byte)(val + 1);
             Memory.Write(adr, res);
             SetZeroNeg(res);
+            Console.Write("INC");
         }
 
         /// <summary>
@@ -1057,8 +1084,9 @@ namespace NES
         /// </summary>
         static void INX(byte val, ushort adr)
         {
-	    X++;
+	        X++;
             SetZeroNeg(X);
+            Console.Write("INX");
         }
 
         /// <summary>
@@ -1066,8 +1094,9 @@ namespace NES
         /// </summary>
         static void INY(byte val, ushort adr)
         {
-	    Y++;
+	        Y++;
             SetZeroNeg(Y);
+            Console.Write("INY");
         }
 	
         /// <summary>
@@ -1076,6 +1105,7 @@ namespace NES
         static void JMP(byte val, ushort adr)
         {
             PC = adr;
+            Console.Write("JMP");
         }
 	
         /// <summary>
@@ -1085,6 +1115,7 @@ namespace NES
         {
             PushWord((ushort)(PC - 1));
             PC = adr;
+            Console.Write("JSR");
         }
 	
         /// <summary>
@@ -1093,8 +1124,9 @@ namespace NES
         static void ORA(byte val, ushort adr)
         {
             A |= val;
-	    SetZeroNeg(A);
-	    add_cycle = Convert.ToInt32(cross);
+	        SetZeroNeg(A);
+	        add_cycle = Convert.ToInt32(cross);
+            Console.Write("ORA");
         }
 
 	// Малышев Максим
@@ -1108,6 +1140,7 @@ namespace NES
             A ^= val;
             SetZeroNeg(A);
             add_cycle = Convert.ToInt32(cross);
+            Console.Write("EOR");
         }
 
 	/// <summary>
@@ -1117,9 +1150,10 @@ namespace NES
         /// <param name="adr"></param>
         static void LDA(byte val, ushort adr)
         {
-            A = Memory.Read(adr);
+            A = val;
             add_cycle = Convert.ToInt32(cross);
             SetZeroNeg(A);
+            Console.Write("LDA");
         }
 
         /// <summary>
@@ -1129,9 +1163,10 @@ namespace NES
         /// <param name="adr"></param>
         static void LDX(byte val, ushort adr)
         {
-            X = Memory.Read(adr);
+            X = val;
             add_cycle = Convert.ToInt32(cross);
             SetZeroNeg(X);
+            Console.Write("LDX");
         }
 
         /// <summary>
@@ -1141,9 +1176,10 @@ namespace NES
         /// <param name="adr"></param>
         static void LDY(byte val, ushort adr)
         {
-            Y = Memory.Read(adr);
+            Y = val;
             add_cycle = Convert.ToInt32(cross);
             SetZeroNeg(Y);
+            Console.Write("LDY");
         }        
 
         /// <summary>
@@ -1151,6 +1187,7 @@ namespace NES
         /// </summary>
         static void NOP(byte val, ushort adr)
         {
+            Console.Write("NOP");
         }
 	
 	/// <summary>
@@ -1161,6 +1198,7 @@ namespace NES
         static void SEC(byte val, ushort adr)
         {
             carry_flag = true;
+            Console.Write("SEC");
         }
 
         /// <summary>
@@ -1171,6 +1209,7 @@ namespace NES
         static void SED(byte val, ushort adr)
         {
             decimal_flag = true;
+            Console.Write("SED");
         }
 
         /// <summary>
@@ -1181,6 +1220,7 @@ namespace NES
         static void SEI(byte val, ushort adr)
         {
             interrupt_flag = true;
+            Console.Write("SEI");
         }
 
         /// <summary>
@@ -1191,6 +1231,7 @@ namespace NES
         static void RTS(byte val, ushort adr)
         {
             PC = (ushort)(PopWord() + 1);
+            Console.Write("RTS");
         }
 
 	/// <summary>
@@ -1201,6 +1242,7 @@ namespace NES
         static void STA(byte val, ushort adr)
         {
             Memory.Write(adr, A);
+            Console.Write("STA");
         }
 
         /// <summary>
@@ -1211,6 +1253,7 @@ namespace NES
         static void STX(byte val, ushort adr)
         {
             Memory.Write(adr, X);
+            Console.Write("STX");
         }
 
         /// <summary>
@@ -1221,6 +1264,7 @@ namespace NES
         static void STY(byte val, ushort adr)
         {
             Memory.Write(adr, Y);
+            Console.Write("STY");
         }
 
 	//Подушкин Иван
@@ -1229,8 +1273,9 @@ namespace NES
         /// </summary>
         static void PHP(byte val, ushort adr)
         {
-	    break_flag = true;
+	        break_flag = true;
             Push(AssembleFlags());
+            Console.Write("PHP");
         }
 
 	/// <summary>
@@ -1240,6 +1285,7 @@ namespace NES
         {
             X = A;
             SetZeroNeg(X);
+            Console.Write("TAX");
         }
 
         /// <summary>
@@ -1249,6 +1295,7 @@ namespace NES
         {
             Y = A;
             SetZeroNeg(Y);
+            Console.Write("TAY");
         }
 
         /// <summary>
@@ -1258,6 +1305,7 @@ namespace NES
         {
             X = SP;
             SetZeroNeg(X);
+            Console.Write("TSX");
         }
 
         /// <summary>
@@ -1267,6 +1315,7 @@ namespace NES
         {
             A = X;
             SetZeroNeg(A);
+            Console.Write("TXA");
         }
 
         /// <summary>
@@ -1276,6 +1325,7 @@ namespace NES
         {
             A = Y;
             SetZeroNeg(A);
+            Console.Write("TYA");
         }
 
         /// <summary>
@@ -1284,6 +1334,7 @@ namespace NES
         public static void TXS(byte val, ushort adr)
         {
             SP = X;
+            Console.Write("TXS");
         }
 
         /// <summary>
@@ -1292,6 +1343,7 @@ namespace NES
         public static void PLP(byte val, ushort adr)
         {
             DisassembleFlags(Pop());
+            Console.Write("PLP");
         }
 
         /// <summary>
@@ -1301,6 +1353,7 @@ namespace NES
         {
             PLP(val, adr);
             PC = PopWord();
+            Console.Write("RTI");
         }
 	
 	/// <summary>
@@ -1316,7 +1369,7 @@ namespace NES
                 if (interruption == Interruption.RESET)
                 {
                     interrupt_flag = true;
-                    SP = 0xFF;                   
+                    //SP = 0xFD;                   
                 }              
             }      
         }
@@ -1324,16 +1377,18 @@ namespace NES
 	/// <summary>
         ///   Шаг процессора
         /// </summary>
-	public static int Step()
+	    public static int Step()
         {
             ushort operandAddr = 0;
             add_cycle = 0;
             cross = false;
-	    is_accum = false;
+	        is_accum = false;
+            Console.Write($"{PC:X}\t");
             byte command = Fetch();
-	    byte operandVal = table[command].adrMode(ref operandAddr);
+	        byte operandVal = table[command].adrMode(ref operandAddr);
             table[command].op(operandVal,operandAddr);
-	    return table[command].cycles + add_cycle;
+            Console.WriteLine($"\tA:{A:X} X:{X:X} Y:{Y:X} P:{AssembleFlags():X} SP:{SP:X}");
+	        return table[command].cycles + add_cycle;
         }
     }
 }
