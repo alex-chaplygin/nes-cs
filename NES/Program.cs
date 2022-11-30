@@ -12,24 +12,31 @@ namespace NES
     {
         static void Main(string[] args)
         {
-            string fileName = @"BattleCity.nes";
+            string fileName = @"nestest.nes";
             if (!Cartridge.ReadFile(fileName))
             {
                 Console.WriteLine("File not found");
             }
-	}
+            Memory.WriteROM1(Cartridge.GetPrgBank(0));
+            Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1));
+            CPU.PC = 0xC000;
+            for (int i = 0; i < 10000; i++)
+            {
+                CPU.Step();
+            }
+        }
 
-	public static void DumpMem(byte[] a)
-	{
-	    int i = 0;
-	    while (i < a.Length)
-	    { 
-		Console.Write ($"{i:X04}:\t");
-		for (int j = 0; j < 16 && i < a.Length; j++, i++)
-		    Console.Write($"{a[i]:X02} "); 
-		Console.WriteLine();
-	    }
-	}
+        public static void DumpMem(byte[] a)
+        {
+            int i = 0;
+            while (i < a.Length)
+            {
+                Console.Write($"{i:X04}:\t");
+                for (int j = 0; j < 16 && i < a.Length; j++, i++)
+                    Console.Write($"{a[i]:X02} ");
+                Console.WriteLine();
+            }
+        }
     }
 }
 

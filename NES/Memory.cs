@@ -138,7 +138,6 @@ namespace NES
         /// <param name="val">записываемое значение</param>
 	public static void Write(ushort adr, byte val)
 	{
-        Console.WriteLine($"adr = {adr:X}");
 	    for (int i = 0; i < memoryTable.Length; i++)
 	    {
 				if (adr < memoryTable[i].upper)
