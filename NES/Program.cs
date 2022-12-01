@@ -19,6 +19,7 @@ namespace NES
             }
             Memory.WriteROM1(Cartridge.GetPrgBank(0));
             Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1));
+	    CPU.Interrupt(Interruption.RESET);
             CPU.PC = 0xC000;
             for (int i = 0; i < 10000; i++)
             {

@@ -1344,7 +1344,6 @@ namespace NES
         /// </summary>
         public static void RTI(ushort adr)
         {
-            byte val = Memory.Read(adr);
             PLP(adr);
             PC = PopWord();
             Console.Write("RTI");
