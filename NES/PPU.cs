@@ -384,7 +384,7 @@ namespace NES
         /// <param name="tile_y">строчка тайла 0-7</param>
         /// <param name="table">номер таблицы тайлов 0-1</param>
         /// <returns></returns>
-        static ushort GetTileAdr(byte tile, int tile_y, int table)
+        public static ushort GetTileAdr(byte tile, int tile_y, int table)
         {
             ushort adr = (ushort)(16 * tile + tile_y + table * 0x1000);
             return adr;

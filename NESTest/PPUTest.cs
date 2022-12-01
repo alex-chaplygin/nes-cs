@@ -114,5 +114,14 @@ namespace NESTest
             Assert.AreEqual(3, PPU.ReadData());
             Assert.AreEqual(2, PPU.ReadData());
         }
+
+	[TestMethod]
+        public void GetTileAdrTest()
+        {
+            Assert.AreEqual(0, PPU.GetTileAdr(0, 0, 0));
+            Assert.AreEqual(0x13, PPU.GetTileAdr(1, 3, 0));
+            Assert.AreEqual(0x1030, PPU.GetTileAdr(3, 0, 1));
+            Assert.AreEqual(0x1025, PPU.GetTileAdr(2, 5, 1));
+        }
     }
 }
