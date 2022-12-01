@@ -21,7 +21,9 @@ namespace NES
         static MapWrite[] mappers = new MapWrite[]
         {
           NROM,
-          MMC1.Write
+          MMC1.Write,
+	  UxROM,
+	  CNROM
         };
         /// <summary>
         /// Инициализация Mapper
@@ -47,6 +49,15 @@ namespace NES
 	{
             throw new Exception(" NROM не поддерживает переключения ");
 	}
-        
+
+	static void UxROM(ushort adr, byte val)
+	{
+            throw new Exception("UxROM не сделано ");
+	}
+	
+	static void CNROM(ushort adr, byte val)
+        {
+            PPU.WritePattern0(Cartridge.GetChrBank(val));
+        }
     }
 }
