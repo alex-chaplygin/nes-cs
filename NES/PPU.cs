@@ -15,7 +15,10 @@ namespace NES
 	const int PPU_MEM_SIZE = 0x4000;
         public const int PATTERN_TABLE_0 = 0x0;
         public const int PATTERN_TABLE_1 = 0x1000;
-
+	public const int NAME_TABLE = 0x2000;
+        public const int PALETTE = 0x3F00;
+        public const int WIDTH_TILES = 32;
+        public const int HEIGHT_TILES = 30;
 	/// <summary>
         /// Ширина экрана в точках
         /// </summary>
@@ -140,6 +143,17 @@ namespace NES
 	///   Первая запись в адрес
 	/// </summary>
         static bool isFirst = true;
+
+	/// <summary>
+        ///   Координата x тайла.
+        /// </summary>
+        static byte tile_x;
+
+
+        /// <summary>
+        ///   Координата y тайла.
+        /// </summary>
+        static byte tile_y;
 
 	/// <summary>
         /// Функция чтения из памяти
@@ -370,10 +384,10 @@ namespace NES
         /// <param name="tile_y">строчка тайла 0-7</param>
         /// <param name="table">номер таблицы тайлов 0-1</param>
         /// <returns></returns>
-        ushort GetTileAdr(byte tile, int tile_y, int table)
+        static ushort GetTileAdr(byte tile, int tile_y, int table)
         {
-            
-            return 0;
+            ushort adr = (ushort)(16 * tile + tile_y + table * 0x1000);
+            return adr;
         }
 
         /// <summary>
@@ -392,16 +406,73 @@ namespace NES
         
         public static byte[] GetScreen()
         {
-            screen_pos = 0;
-            int tile = 0;
-	    //            BeginFrame();
-
+	    BeginFrame();
+         
             for (int i = 0; i < HEIGHT; i++)
+            {
+                ushort address2 = address;
                 for (int j = 0; j < WIDTH; j++)
                 {
-                    RenderPixel(j / 4);
+                    RenderPixel(GetTilePixel(memory[address], background_table));
+                    tile_x++;
+                    if (tile_x == 8)
+                        NextTile();
                 }
+                EndLine(address2);
+            }
             return screen;            
         }
+
+	/// <summary>
+        /// Подготовитеьные действия в начале кадра
+        /// </summary>
+        static void BeginFrame()
+		{
+            screen_pos = 0;
+            tile_x = 0;
+            tile_y = 0;
+            address = (ushort)(NAME_TABLE + nametable * 0x400);
+        }
+        
+	/// <summary>
+        /// Перейти на следующую плитку
+        /// </summary>
+        static void NextTile()
+        {
+            tile_x = 0;
+            address++;
+        }
+        
+        /// <summary>
+        /// Окончание отрисовки строки
+        /// </summary>
+        static void EndLine(ushort address2)
+        {
+            tile_y++;
+            address = address2;
+
+            if (tile_y == 8)
+            {
+                tile_y = 0;
+                address += WIDTH_TILES;
+            }
+        }
+
+        /// <summary>
+        /// Получение текущего пикселя плитки
+        /// </summary>
+        static int GetTilePixel(byte tile, int table)
+        {
+            ushort a = GetTileAdr(tile, tile_y, table);
+            byte low = memory[a];
+            byte up = memory[a + 8];
+
+            int l = (low >> (7 - tile_x)) & 1;
+            int u = (up >> (7 - tile_x)) & 1;
+
+            int color = l + (u << 1);
+     
+            return memory[PALETTE + color];            
+        }	
     }
 }
