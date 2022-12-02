@@ -66,19 +66,22 @@ namespace NES
         public static void Chr0()
         {
             sw = Banks.Chr0;
-            Console.WriteLine(sw);
+	    PPU.WritePattern0(Cartridge.GetChrBank(bank));
         }
+
         public static void Chr1()
         {
             sw = Banks.Chr1;
-            Console.WriteLine(sw);
+	    PPU.WritePattern1(Cartridge.GetChrBank(bank));
         }
-        public static void Prg()
+
+	public static void Prg()
         {
             sw = Banks.Prg;
-            Console.WriteLine(sw);
+	    Memory.WriteROM1(Cartridge.GetPrgBank(bank));
         }
-        public static void Switch(ushort adr)
+
+	public static void Switch(ushort adr)
         {
             bank = registr; 
             SwitchReg[] switchTable = new SwitchReg[]
