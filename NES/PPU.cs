@@ -145,6 +145,21 @@ namespace NES
         static bool isFirst = true;
 
 	/// <summary>
+	/// Флаг переполнения спрайтов
+	/// </summary>
+	public static bool sprite_overflow;
+
+	/// <summary>
+	/// Флаг наложения непустого пикселя спрайта 0 на непустой пиксель фона
+	/// </summary>
+	public static bool sprite_0_hit;
+
+	/// <summary>
+	/// Флаг кадровой развертки
+	/// </summary>
+	public static bool vertical_blank;
+
+	/// <summary>
         ///   Координата x тайла.
         /// </summary>
         static byte tile_x;
@@ -196,7 +211,7 @@ namespace NES
         {
             new Register( 0x2000, null, ControllerWrite ),
 	    new Register( 0x2001, null, MaskWrite ),
-            //new Register( 0x2002, StatusRead, null ),
+            new Register( 0x2002, StatusRead, null ),
             //new Register( 0x2003, null, OAMadrWrite ),
             //new Register( 0x2004, OAMdataRead, OAMdataWrite ),
             new Register( 0x2005, null, SetScroll ),
@@ -375,6 +390,17 @@ namespace NES
             red_available = ((val >> 5) & 1) > 0;
             green_available = ((val >> 6) & 1) > 0;
             blue_available = ((val >> 7) & 1) > 0;
+        }
+
+	/// <summary>
+        /// Чтение регистра статуса
+        /// </summary>
+        /// <returns></returns>
+        public static byte StatusRead()
+        {
+            byte result = (byte)((Convert.ToByte(sprite_overflow) << 5) | (Convert.ToByte(sprite_0_hit) << 6) | (Convert.ToByte(vertical_blank) << 7));
+	    isFirst = true;
+            return result;
         }
 
         /// <summary>

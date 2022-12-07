@@ -123,5 +123,22 @@ namespace NESTest
             Assert.AreEqual(0x1030, PPU.GetTileAdr(3, 0, 1));
             Assert.AreEqual(0x1025, PPU.GetTileAdr(2, 5, 1));
         }
+
+	[TestMethod]
+        public void Test_StatusRead()
+        {
+            PPU.sprite_overflow = true;
+            PPU.sprite_0_hit = false;
+            PPU.vertical_blank = true;
+            Assert.AreEqual(0b_1010_0000, PPU.StatusRead());
+            PPU.sprite_overflow = false;
+            PPU.sprite_0_hit = true;
+            PPU.vertical_blank = true;
+            Assert.AreEqual(0b_1100_0000, PPU.StatusRead());
+            PPU.sprite_overflow = true;
+            PPU.sprite_0_hit = true;
+            PPU.vertical_blank = false;
+            Assert.AreEqual(0b_0110_0000, PPU.StatusRead());
+        }
     }
 }
