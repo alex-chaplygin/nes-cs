@@ -140,5 +140,19 @@ namespace NESTest
             PPU.vertical_blank = false;
             Assert.AreEqual(0b_0110_0000, PPU.StatusRead());
         }
+
+	[TestMethod]
+        public void DMATest()
+        {
+            for (int i = 0; i < 256; i++)
+            {
+                Memory.Write((ushort)((0x02 << 8) + i), (byte)i);
+            }
+            PPU.OAM_address = 1;
+            PPU.DMA(0x02);
+            Assert.AreEqual(PPU.OAM_memory[0], 255);
+            Assert.AreEqual(PPU.OAM_memory[64], 63);
+            Assert.AreEqual(PPU.OAM_memory[255], 254);
+        }
     }
 }

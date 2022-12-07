@@ -19,6 +19,7 @@ namespace NES
         public const int PALETTE = 0x3F00;
         public const int WIDTH_TILES = 32;
         public const int HEIGHT_TILES = 30;
+	public const int OAM_SIZE = 0x100;
 	/// <summary>
         /// Ширина экрана в точках
         /// </summary>
@@ -33,6 +34,11 @@ namespace NES
         /// Память видеопроцессора
         /// </summary>
         public static byte[] memory = new byte[PPU_MEM_SIZE];
+
+	/// <summary>
+        /// Память спрайтов
+        /// </summary>
+        public static byte[] OAM_memory = new byte[OAM_SIZE];
 
         /// <summary>
         /// Палитра 64 цвета
@@ -130,6 +136,11 @@ namespace NES
 	public static ushort address;
 
 	/// <summary>
+        ///   Регистр адреса OAM
+        /// </summary>
+        public static byte OAM_address;
+
+	/// <summary>
         /// Буффер памяти
         /// </summary>
         public static byte read_buffer;
@@ -213,11 +224,11 @@ namespace NES
 	    new Register( 0x2001, null, MaskWrite ),
             new Register( 0x2002, StatusRead, null ),
             //new Register( 0x2003, null, OAMadrWrite ),
-            //new Register( 0x2004, OAMdataRead, OAMdataWrite ),
+            new Register( 0x2004, OAMRead, OAMWrite ),
             new Register( 0x2005, null, SetScroll ),
             new Register( 0x2006, null, SetAddress ),
             new Register( 0x2007, DataRead, DataWrite ),
-            /*new Register( 0x4014, null, DMA )  */ 
+            new Register( 0x4014, null, DMA )  
         };
 	
 	/// <summary>
@@ -306,7 +317,35 @@ namespace NES
             read_buffer = memory[address];
             IncreaseAddress();
             return b;
-	} 
+	}
+
+	/// <summary>
+        ///   Запись в память спрайтов
+        /// </summary>
+        public static void OAMWrite(byte value)
+        {
+            OAM_memory[OAM_address++] = value;
+        }
+
+        /// <summary>
+        ///   Чтение из памяти спрайтов
+        /// </summary>
+        public static byte OAMRead()
+        {
+            if (vertical_blank)
+                return OAM_memory[OAM_address];
+            else
+                return OAM_memory[OAM_address++];
+        }
+
+	/// <summary>
+        ///   Direct Memory Access  
+        /// </summary>
+        public static void DMA(byte value)
+        {
+            for (int i = 0; i < OAM_SIZE; i++)
+               OAMWrite(Memory.Read((ushort)((value << 8) + i)));
+        }
 	
 	/// <summary>
         /// Записать таблицу шаблонов 0
