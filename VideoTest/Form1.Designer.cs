@@ -38,7 +38,6 @@ namespace VideoTest
             this.ClientSize = new System.Drawing.Size(496, 442);
             this.Name = "form11";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.ResumeLayout(false);
 

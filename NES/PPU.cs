@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 
 namespace NES
 {
-    
+
     /// <summary>
     ///   Графический процессор
     /// </summary>
     public class PPU
     {
-	const int PPU_MEM_SIZE = 0x4000;
+        const int PPU_MEM_SIZE = 0x4000;
         public const int PATTERN_TABLE_0 = 0x0;
         public const int PATTERN_TABLE_1 = 0x1000;
-	public const int NAME_TABLE = 0x2000;
+        public const int NAME_TABLE = 0x2000;
         public const int PALETTE = 0x3F00;
         public const int WIDTH_TILES = 32;
         public const int HEIGHT_TILES = 30;
-	public const int OAM_SIZE = 0x100;
-	/// <summary>
+        public const int OAM_SIZE = 0x100;
+        const int ATTRIBUTE_GRID = 0x23C0;
+        /// <summary>
         /// Ширина экрана в точках
         /// </summary>
         public const int WIDTH = 256;
@@ -35,7 +36,7 @@ namespace NES
         /// </summary>
         public static byte[] memory = new byte[PPU_MEM_SIZE];
 
-	/// <summary>
+        /// <summary>
         /// Память спрайтов
         /// </summary>
         public static byte[] OAM_memory = new byte[OAM_SIZE];
@@ -44,22 +45,22 @@ namespace NES
         /// Палитра 64 цвета
         /// </summary>
         public static byte[] palette = new byte[] {
-            84, 84, 84, 0, 30, 116, 8, 16, 144, 48, 0, 136, 68, 0, 100, 92, 0, 48, 84, 4, 0, 60, 24, 0, 32, 42, 0, 8, 58, 0, 0, 64, 0, 0, 60, 0, 0, 50, 60, 0, 0, 0,
-            152, 150, 152, 8, 76, 19, 48, 50, 236, 92, 30, 228, 136, 20, 176, 160, 20, 100, 152, 34, 32, 120, 60, 0, 84, 90, 0, 40, 114, 0, 8, 124, 0, 0, 118, 40, 0, 102, 120, 0, 0, 0,
-            236, 238, 236, 76, 154, 236, 120, 124, 236, 176, 98, 236, 228, 84, 236, 236, 88, 180, 236, 106, 100, 212, 136, 32, 160, 170, 0, 116, 196, 0, 76, 208, 32, 56, 204, 108, 56, 180, 204, 60, 60, 60,
-            236, 238, 236, 168, 204, 236, 188, 188, 236, 212, 178, 236, 236, 174, 236, 236, 174, 212, 236, 180, 176, 228, 196, 144, 204, 210, 120, 180, 222, 120, 168, 226, 144, 152, 226, 180, 160, 214, 228, 160, 162, 160
+            84, 84, 84, 0, 30, 116, 8, 16, 144, 48, 0, 136, 68, 0, 100, 92, 0, 48, 84, 4, 0, 60, 24, 0, 32, 42, 0, 8, 58, 0, 0, 64, 0, 0, 60, 0, 0, 50, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            152, 150, 152, 8, 76, 19, 48, 50, 236, 92, 30, 228, 136, 20, 176, 160, 20, 100, 152, 34, 32, 120, 60, 0, 84, 90, 0, 40, 114, 0, 8, 124, 0, 0, 118, 40, 0, 102, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            236, 238, 236, 76, 154, 236, 120, 124, 236, 176, 98, 236, 228, 84, 236, 236, 88, 180, 236, 106, 100, 212, 136, 32, 160, 170, 0, 116, 196, 0, 76, 208, 32, 56, 204, 108, 56, 180, 204, 60, 60, 60, 0, 0, 0, 0, 0, 0,
+            236, 238, 236, 168, 204, 236, 188, 188, 236, 212, 178, 236, 236, 174, 236, 236, 174, 212, 236, 180, 176, 228, 196, 144, 204, 210, 120, 180, 222, 120, 168, 226, 144, 152, 226, 180, 160, 214, 228, 160, 162, 160, 0, 0, 0, 0, 0, 0,
         };
 
         /// <summary>
         /// Массив точек экрана
         /// </summary>
-	public static byte[] screen = new byte[WIDTH * HEIGHT * 3];
+        public static byte[] screen = new byte[WIDTH * HEIGHT * 3];
 
-	/// <summary>
+        /// <summary>
         /// позиция в массиве экрана
         /// </summary>
         public static int screen_pos;
-	
+
         /// <summary>
         /// Номер экрана
         /// </summary>
@@ -90,7 +91,7 @@ namespace NES
         /// </summary>
         public static bool generate_nmi;
 
-	/// <summary>
+        /// <summary>
         /// Если 0, то обычные цвета, если 1 то изображение становится чёрн-белым
         /// </summary>
         public static bool greyscale;
@@ -129,48 +130,48 @@ namespace NES
         /// Если 0, то цвет теряет значение синего (= 0), если 1, то ничего
         /// </summary>
         public static bool blue_available;
-	
-	/// <summary>
-	///   Регистр адреса
-	/// </summary>
-	public static ushort address;
 
-	/// <summary>
+        /// <summary>
+        ///   Регистр адреса
+        /// </summary>
+        public static ushort address;
+
+        /// <summary>
         ///   Регистр адреса OAM
         /// </summary>
         public static byte OAM_address;
 
-	/// <summary>
+        /// <summary>
         /// Буффер памяти
         /// </summary>
         public static byte read_buffer;
 
-	/// <summary>
+        /// <summary>
         /// Регистр позиции прокрутки ППУ
         /// </summary>
         public static ushort scroll;
 
-	/// <summary>
-	///   Первая запись в адрес
-	/// </summary>
+        /// <summary>
+        ///   Первая запись в адрес
+        /// </summary>
         static bool isFirst = true;
 
-	/// <summary>
-	/// Флаг переполнения спрайтов
-	/// </summary>
-	public static bool sprite_overflow;
+        /// <summary>
+        /// Флаг переполнения спрайтов
+        /// </summary>
+        public static bool sprite_overflow;
 
-	/// <summary>
-	/// Флаг наложения непустого пикселя спрайта 0 на непустой пиксель фона
-	/// </summary>
-	public static bool sprite_0_hit;
+        /// <summary>
+        /// Флаг наложения непустого пикселя спрайта 0 на непустой пиксель фона
+        /// </summary>
+        public static bool sprite_0_hit;
 
-	/// <summary>
-	/// Флаг кадровой развертки
-	/// </summary>
-	public static bool vertical_blank;
+        /// <summary>
+        /// Флаг кадровой развертки
+        /// </summary>
+        public static bool vertical_blank;
 
-	/// <summary>
+        /// <summary>
         ///   Координата x тайла.
         /// </summary>
         static byte tile_x;
@@ -181,7 +182,7 @@ namespace NES
         /// </summary>
         static byte tile_y;
 
-	/// <summary>
+        /// <summary>
         /// Функция чтения из памяти
         /// </summary>
         /// <returns></returns>
@@ -221,22 +222,22 @@ namespace NES
         static Register[] memoryTable = new Register[]
         {
             new Register( 0x2000, null, ControllerWrite ),
-	    new Register( 0x2001, null, MaskWrite ),
+        new Register( 0x2001, null, MaskWrite ),
             new Register( 0x2002, StatusRead, null ),
             //new Register( 0x2003, null, OAMadrWrite ),
             new Register( 0x2004, OAMRead, OAMWrite ),
             new Register( 0x2005, null, SetScroll ),
             new Register( 0x2006, null, SetAddress ),
             new Register( 0x2007, DataRead, DataWrite ),
-            new Register( 0x4014, null, DMA )  
+            new Register( 0x4014, null, DMA )
         };
-	
-	/// <summary>
-	///   Запись в регистр PPU
-	/// </summary>
+
+        /// <summary>
+        ///   Запись в регистр PPU
+        /// </summary>
         public static void Write(ushort adr, byte value)
         {
-	    for(int i = 0; i < memoryTable.Length; i++)
+            for (int i = 0; i < memoryTable.Length; i++)
                 if (adr == memoryTable[i].adr)
                 {
                     if (memoryTable[i].write == null)
@@ -249,12 +250,12 @@ namespace NES
                 }
         }
 
-	/// <summary>
-	///   Чтение из регистра PPU
-	/// </summary>
+        /// <summary>
+        ///   Чтение из регистра PPU
+        /// </summary>
         public static byte Read(ushort adr)
         {
-	    for (int i = 0; i < memoryTable.Length; i++)
+            for (int i = 0; i < memoryTable.Length; i++)
                 if (adr == memoryTable[i].adr)
                 {
                     if (memoryTable[i].read == null)
@@ -267,10 +268,10 @@ namespace NES
             return 0;
         }
 
-	/// <summary>
-	///   Записать адрес, сначала старший байт, затем младший
-	/// </summary>
-	public static void SetAddress(byte val)
+        /// <summary>
+        ///   Записать адрес, сначала старший байт, затем младший
+        /// </summary>
+        public static void SetAddress(byte val)
         {
             if (isFirst)
             {
@@ -285,41 +286,41 @@ namespace NES
             }
         }
 
-	/// <summary>
-	/// Увеличить адрес, если increment=0, то на 1; если increment=1, то на 32
-	/// </summary>
-	/// <param name="adr"></param>
-	static void IncreaseAddress ()
-	{
-	    if (increment == 0)
-		address++;
-	    else if (increment == 1)
-		address += 32;
-	}
-	
-	/// <summary>
-	/// Записать в память байт по адресу
-	/// </summary>
-	/// <param name="bt"></param>
-	public static void DataWrite (byte bt)
-	{
-	    memory[address] = bt;
-	    IncreaseAddress();
-	} 
+        /// <summary>
+        /// Увеличить адрес, если increment=0, то на 1; если increment=1, то на 32
+        /// </summary>
+        /// <param name="adr"></param>
+        static void IncreaseAddress()
+        {
+            if (increment == 0)
+                address++;
+            else if (increment == 1)
+                address += 32;
+        }
 
-	/// <summary>
-	/// Прочитать из памяти байт по адресу
-	/// </summary>
-	/// <param name="bt"></param>
-	static byte DataRead ()
-	{
-	    byte b = read_buffer;
+        /// <summary>
+        /// Записать в память байт по адресу
+        /// </summary>
+        /// <param name="bt"></param>
+        public static void DataWrite(byte bt)
+        {
+            memory[address] = bt;
+            IncreaseAddress();
+        }
+
+        /// <summary>
+        /// Прочитать из памяти байт по адресу
+        /// </summary>
+        /// <param name="bt"></param>
+        static byte DataRead()
+        {
+            byte b = read_buffer;
             read_buffer = memory[address];
             IncreaseAddress();
             return b;
-	}
+        }
 
-	/// <summary>
+        /// <summary>
         ///   Запись в память спрайтов
         /// </summary>
         public static void OAMWrite(byte value)
@@ -338,16 +339,16 @@ namespace NES
                 return OAM_memory[OAM_address++];
         }
 
-	/// <summary>
+        /// <summary>
         ///   Direct Memory Access  
         /// </summary>
         public static void DMA(byte value)
         {
             for (int i = 0; i < OAM_SIZE; i++)
-               OAMWrite(Memory.Read((ushort)((value << 8) + i)));
+                OAMWrite(Memory.Read((ushort)((value << 8) + i)));
         }
-	
-	/// <summary>
+
+        /// <summary>
         /// Записать таблицу шаблонов 0
         /// </summary>
         /// <param name="data">Данные шаблонов</param>
@@ -360,12 +361,12 @@ namespace NES
         /// Записать таблицу шаблонов 1
         /// </summary>
         /// <param name="data">Данные шаблонов</param>
-        public static void WritePattern1 (byte[] data)
+        public static void WritePattern1(byte[] data)
         {
             data.CopyTo(memory, PATTERN_TABLE_1);
         }
 
-	// Акименко Максим 
+        // Акименко Максим 
         /// <summary>
         /// первый раз старший байт регистра прокрутки второй младший байт регистра прокрутки
         /// </summary>
@@ -386,7 +387,7 @@ namespace NES
             }
         }
 
-	/// <summary>
+        /// <summary>
         /// Записать в регистр управления
         /// </summary>
         /// <param name="val">значение</param>
@@ -394,13 +395,13 @@ namespace NES
         {
             nametable = val & 3;
             increment = (val >> 2) & 1;
-            sprite_table = (val >> 3) & 1;            
+            sprite_table = (val >> 3) & 1;
             background_table = (val >> 4) & 1;
-            sprite_size = (val >> 5) & 1;            
+            sprite_size = (val >> 5) & 1;
             generate_nmi = ((val >> 7) & 1) > 0;
         }
 
-	/// <summary>
+        /// <summary>
         /// Вычисляет настоящий адрес на основе зеркалированного адреса
         /// </summary>
         /// <param name="adr">Зеркалированный адрес</param>
@@ -415,7 +416,7 @@ namespace NES
             return adr;
         }
 
-	/// <summary>
+        /// <summary>
         /// Извлечь значения маски PPU
         /// </summary>
         /// <param name="val">значение</param>
@@ -431,14 +432,14 @@ namespace NES
             blue_available = ((val >> 7) & 1) > 0;
         }
 
-	/// <summary>
+        /// <summary>
         /// Чтение регистра статуса
         /// </summary>
         /// <returns></returns>
         public static byte StatusRead()
         {
             byte result = (byte)((Convert.ToByte(sprite_overflow) << 5) | (Convert.ToByte(sprite_0_hit) << 6) | (Convert.ToByte(vertical_blank) << 7));
-	    isFirst = true;
+            isFirst = true;
             return result;
         }
 
@@ -461,18 +462,18 @@ namespace NES
         /// <param name="value">Номер цвета палитры</param>
         static void RenderPixel(int value)
         {
-            if(greyscale)
+            if (greyscale)
                 value &= 0x30;
-            screen[screen_pos] = blue_available  ? palette[value * 3 + 2] : (byte)0;
+            screen[screen_pos] = blue_available ? palette[value * 3 + 2] : (byte)0;
             screen[screen_pos + 1] = green_available ? palette[value * 3 + 1] : (byte)0;
             screen[screen_pos + 2] = red_available ? palette[value * 3] : (byte)0;
             screen_pos += 3;
         }
-        
+
         public static byte[] GetScreen()
         {
-	    BeginFrame();
-         
+            BeginFrame();
+
             for (int i = 0; i < HEIGHT; i++)
             {
                 ushort address2 = address;
@@ -485,21 +486,21 @@ namespace NES
                 }
                 EndLine(address2);
             }
-            return screen;            
+            return screen;
         }
 
-	/// <summary>
+        /// <summary>
         /// Подготовитеьные действия в начале кадра
         /// </summary>
         static void BeginFrame()
-		{
+        {
             screen_pos = 0;
             tile_x = 0;
             tile_y = 0;
-            address = (ushort)(NAME_TABLE + nametable * 0x400);
+            address = MirrorAdr((ushort)(NAME_TABLE + nametable * 0x400));
         }
-        
-	/// <summary>
+
+        /// <summary>
         /// Перейти на следующую плитку
         /// </summary>
         static void NextTile()
@@ -507,7 +508,7 @@ namespace NES
             tile_x = 0;
             address++;
         }
-        
+
         /// <summary>
         /// Окончание отрисовки строки
         /// </summary>
@@ -532,12 +533,50 @@ namespace NES
             byte low = memory[a];
             byte up = memory[a + 8];
 
+            int atr = GetAttribute();
+
             int l = (low >> (7 - tile_x)) & 1;
             int u = (up >> (7 - tile_x)) & 1;
 
             int color = l + (u << 1);
-     
-            return memory[PALETTE + color];            
-        }	
+
+            int pixel = GetPalettePixel(color, atr);
+            return pixel;
+        }
+
+
+        static int GetCurX()
+        {
+            return address & 0x1F;
+        }
+
+        static int GetCurY()
+        {
+            return (address >> 5) & 0x1F;
+        }
+
+        /// <summary>
+        /// Получить номер палитры тайла по аттрибуту
+        /// </summary>
+        /// <returns></returns>
+        static int GetAttribute()
+        {
+            int x = tile_x / 8;
+            int y = tile_y / 8;
+            int quadrant = x / 8 % 8;
+            // int tile_attr = memory[ATTRIBUTE_GRID + (x/2) + (y/2) * 8];
+            return tile_attr;
+        }
+
+
+        /// <summary>
+        /// Окраска пикселя по палитре
+        /// </summary>
+        static int GetPalettePixel(int color, int palette)
+        {
+            if (color == 0)
+                palette = 0;
+            return memory[PALETTE + palette * 4 + color];
+        }
     }
 }
