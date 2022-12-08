@@ -52,7 +52,7 @@ namespace NES
 
 	static void UxROM(ushort adr, byte val)
 	{
-            throw new Exception("UxROM не сделано ");
+            Memory.WriteROM1(Cartridge.GetPrgBank(val & 0xF));
 	}
 	
 	static void CNROM(ushort adr, byte val)
