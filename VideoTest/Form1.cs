@@ -1,4 +1,4 @@
-﻿﻿using NES;
+﻿using NES;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +21,8 @@ namespace VideoTest
             Height = 720 + 37;
 
             PPU.MaskWrite(0xFE);
-            Memory.Write(0x2000, 0x13);
+            Memory.Write(0x2000, 0x22);
+            Memory.Write(0x2001, 0xFE);
             SetupTiles();
             SetupPalette();
             SetupNames();
@@ -40,7 +41,7 @@ namespace VideoTest
             for (int i = 0; i < tile_bytes.Length; i++)
                 Memory.Write(0x2007, tile_bytes[i]);
 
-            string fileName = @"Super_mario_brothers.nes";
+            string fileName = @"Tetris.nes";
             if (!Cartridge.ReadFile(fileName))
             {
                 Console.WriteLine("File not found");
@@ -51,7 +52,17 @@ namespace VideoTest
 
         static void SetupPalette()
         {
-            byte[] palette_bytes = new byte[] { 0x03, 0x28, 0x15, 0x23, 0x32, 0x14, 0x3F, 0x12, 0x01, 0x02, 0x04, 0x05, 0x06, 0x07, 0x08 };
+            byte[] palette_bytes = new byte[] { 
+                0x03, 0x28, 0x15, 0x23, 
+                0x0, 0x14, 0x3F, 0x12,
+                0x0, 0x02, 0x04, 0x05,
+                0x0, 0x07, 0x08, 0x09,
+
+                0x0, 0x21, 0x14, 0x02,
+                0x0, 0x14, 0xF, 0xA,
+                0x0, 0x19, 0x15, 0xA,
+                0x0, 0x2B, 0x8, 0x31
+            };
 
             Memory.Write(0x2006, 0x3F);
             Memory.Write(0x2006, 0x00);
@@ -101,12 +112,28 @@ namespace VideoTest
         {
             Memory.Write(0x2003, 0);
             for (int i = 0; i < 64; i++)
-                Memory.Write(0x2004, 0xFF);
+                for(int j = 0; j < 4; j++)
+                    Memory.Write(0x2004, 0xFF);
             Memory.Write(0x2003, 0);
-            Memory.Write(0x2004, 125);
-            Memory.Write(0x2004, 2);
+            Memory.Write(0x2004, 15);
+            Memory.Write(0x2004, 0);
             Memory.Write(0x2004, 0);
             Memory.Write(0x2004, 125);
+
+           /* Memory.Write(0x2004, 15);
+            Memory.Write(0x2004, 1);
+            Memory.Write(0x2004, 1);
+            Memory.Write(0x2004, 125);
+
+            Memory.Write(0x2004, 15);
+            Memory.Write(0x2004, 2);
+            Memory.Write(0x2004, 2);
+            Memory.Write(0x2004, 125);
+
+            Memory.Write(0x2004, 15);
+            Memory.Write(0x2004, 3);
+            Memory.Write(0x2004, 3);
+            Memory.Write(0x2004, 125);*/
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
