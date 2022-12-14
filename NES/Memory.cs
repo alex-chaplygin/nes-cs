@@ -127,7 +127,10 @@ namespace NES
         /// <returns>значение из памяти</returns>
 	public static ushort ReadWord(ushort adr)
 	{
-	    return (ushort)((Read((ushort)(adr + 1)) << 8) | Read(adr));
+	    if ((adr & 0x00FF) == 0x00FF)
+		return (ushort)(Read((ushort)(adr & 0xFF00)));
+	    else
+		return (ushort)((Read((ushort)(adr + 1)) << 8) | Read(adr));
 	}
 
 	// Киселев Николай

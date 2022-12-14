@@ -1,4 +1,4 @@
-﻿using NES;
+using NES;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,11 +21,12 @@ namespace VideoTest
             Height = 720 + 37;
 
             PPU.MaskWrite(0xFE);
-            Memory.Write(0x2000, 0x51);
+            Memory.Write(0x2000, 0x13);
             SetupTiles();
             SetupPalette();
             SetupNames();
-            Cartridge.mirroring = Mirroring.Horisontal;
+            SetupSprites();
+            Cartridge.mirroring = Mirroring.FourScreen;
         }
 
         static void SetupTiles()
@@ -69,24 +70,43 @@ namespace VideoTest
                     if (x < 8 && y < 8)
                         Memory.Write(0x2007, (byte)(x + 8 * y));
                     else
-                        Memory.Write(0x2007, (byte)0);
+                        Memory.Write(0x2007, 0);
+            
             for (int y = 0; y < 64; y++)
-                Memory.Write(0x2007, (byte)0);
+                 Memory.Write(0x2007, (byte)(y % 256));
+
             for (int y = 0; y < 30; y++)
                 for (int x = 0; x < 32; x++)
                     Memory.Write(0x2007, (byte)(x+y));
+
             for (int y = 0; y < 64; y++)
-                Memory.Write(0x2007, (byte)0);
+                Memory.Write(0x2007, 1);
+
             for (int y = 0; y < 30; y++)
                 for (int x = 0; x < 32; x++)
                     Memory.Write(0x2007, 2);
+
             for (int y = 0; y < 64; y++)
-                Memory.Write(0x2007, (byte)0);
+                Memory.Write(0x2007, 5);
+
             for (int y = 0; y < 30; y++)
                 for (int x = 0; x < 32; x++)
                     Memory.Write(0x2007, 3);
+
             for (int y = 0; y < 64; y++)
-                Memory.Write(0x2007, (byte)0);
+                Memory.Write(0x2007, 8);
+        }
+
+        void SetupSprites()
+        {
+            Memory.Write(0x2003, 0);
+            for (int i = 0; i < 64; i++)
+                Memory.Write(0x2004, 0xFF);
+            Memory.Write(0x2003, 0);
+            Memory.Write(0x2004, 125);
+            Memory.Write(0x2004, 2);
+            Memory.Write(0x2004, 0);
+            Memory.Write(0x2004, 125);
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -96,7 +116,7 @@ namespace VideoTest
                 fixed (byte* ptr = PPU.GetScreen())
                 {
                     Image bmp = new Bitmap(256, 240, 256 * 3, System.Drawing.Imaging.PixelFormat.Format24bppRgb, new IntPtr(ptr));
-                    e.Graphics.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+                    e.Graphics.DrawImage(bmp, new Rectangle(0, 0, Width - 10, Height - 34));
                 }
             }
         }

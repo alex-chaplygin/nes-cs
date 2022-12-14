@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +21,24 @@ namespace NES
         public const int HEIGHT_TILES = 30;
         public const int OAM_SIZE = 0x100;
         const int ATTRIBUTE_GRID = 0x23C0;
+        const int MAX_SPRITES = 64;
+
+        struct Sprite
+        {
+            public int x;
+            public int y;
+            public int tile;
+            public int atribute;
+
+            public Sprite(int x, int y, int tile, int atribute)
+            {
+                this.x = x;
+                this.y = y;
+                this.tile = tile;
+                this.atribute = atribute;
+            }
+        } 
+
         /// <summary>
         /// Ширина экрана в точках
         /// </summary>
@@ -40,6 +58,8 @@ namespace NES
         /// Память спрайтов
         /// </summary>
         public static byte[] OAM_memory = new byte[OAM_SIZE];
+
+        static List<Sprite> sprites = new List<Sprite>();
 
         /// <summary>
         /// Палитра 64 цвета
@@ -477,6 +497,7 @@ namespace NES
             for (int i = 0; i < HEIGHT; i++)
             {
                 ushort address2 = address;
+                EvaluateSprites(i);
                 for (int j = 0; j < WIDTH; j++)
                 {
                     RenderPixel(GetTilePixel(memory[address], background_table));
@@ -544,12 +565,19 @@ namespace NES
             return pixel;
         }
 
-
+        /// <summary>
+        /// получить координату x текущего тайла
+        /// </summary>
+        /// <returns></returns>
         static int GetCurX()
         {
             return address & 0x1F;
         }
 
+        /// <summary>
+        /// получить координату y текущего тайла
+        /// </summary>
+        /// <returns></returns>
         static int GetCurY()
         {
             return (address >> 5) & 0x1F;
@@ -559,13 +587,21 @@ namespace NES
         /// Получить номер палитры тайла по аттрибуту
         /// </summary>
         /// <returns></returns>
-        static int GetAttribute()
+        static byte GetAttribute()
         {
-            int x = tile_x / 8;
-            int y = tile_y / 8;
-            int quadrant = x / 8 % 8;
-            // int tile_attr = memory[ATTRIBUTE_GRID + (x/2) + (y/2) * 8];
-            return tile_attr;
+            int x = GetCurX();
+            int y = GetCurY();
+            byte attr = memory[0x3c0 + NAME_TABLE + nametable * 0x400 + x / 4  + y / 4 * 8];
+            //int b2 = attr / 8 % 8;
+
+            int ix = x % 4;
+            int iy = y % 4;
+
+            if (ix <= 1 && iy <= 1) return (byte)(attr & 3);
+            if (ix > 1 && iy <= 1) return (byte)((attr >> 2) & 3);
+            if (ix <= 1 && iy > 1) return (byte)((attr >> 4) & 3);
+            if (ix > 1 && iy > 1) return (byte)(attr >> 6);
+            return 0;
         }
 
 
@@ -577,6 +613,26 @@ namespace NES
             if (color == 0)
                 palette = 0;
             return memory[PALETTE + palette * 4 + color];
+        }
+
+        /// <summary>
+        /// Вычилить первые 8 спрайтов на заданой строке
+        /// </summary>
+        /// <param name="line_y">номер строки</param>
+        static void EvaluateSprites(int line_y)
+        {
+            int sprite_height = sprite_size * 8 + 8;
+            sprites.Clear();
+            for (int i = 0; i < MAX_SPRITES; i++)
+            {
+                int y = OAM_memory[i * 4];
+                int tile = OAM_memory[i * 4 + 1];
+                int atr = OAM_memory[i * 4 + 2];
+                int x = OAM_memory[i * 4 + 3];
+
+                if (y <= line_y && y + sprite_height >= line_y)
+                    sprites.Add(new Sprite(x,y,tile,atr));
+            }
         }
     }
 }
