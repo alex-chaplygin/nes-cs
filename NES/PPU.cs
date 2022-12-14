@@ -460,6 +460,7 @@ namespace NES
         {
             byte result = (byte)((Convert.ToByte(sprite_overflow) << 5) | (Convert.ToByte(sprite_0_hit) << 6) | (Convert.ToByte(vertical_blank) << 7));
             isFirst = true;
+            vertical_blank = false;
             return result;
         }
 
@@ -490,6 +491,10 @@ namespace NES
             screen_pos += 3;
         }
 
+        /// <summary>
+        /// Основной цикл отрисовки
+        /// </summary>
+        /// <returns>Массив точек экрана</returns>
         public static byte[] GetScreen()
         {
             BeginFrame();
@@ -500,7 +505,12 @@ namespace NES
                 EvaluateSprites(i);
                 for (int j = 0; j < WIDTH; j++)
                 {
-                    RenderPixel(GetTilePixel(memory[address], background_table));
+                    int back_color = GetTilePixel(memory[address], background_table);
+                    int back_atr = GetAttribute();
+                    int sprite_color = GetSpriteColor(j);
+                    int color = Combine(back_color, sprite_color);
+                    int pixel = GetPalettePixel(color, back_atr);
+                    RenderPixel(pixel);
                     tile_x++;
                     if (tile_x == 8)
                         NextTile();
@@ -511,6 +521,19 @@ namespace NES
         }
 
         /// <summary>
+        /// Вычисление цвета пикселя при наложении спрайта на фон
+        /// </summary>
+        /// <param name="back_color">Цвет пикселя фона</param>
+        /// <param name="sprite_color">Цвет пикселя спрайта</param>
+        /// <returns>Финальный цвет пикселя</returns>
+        static int Combine(int back_color, int sprite_color)
+        {
+            if (sprite_color == 0)
+                return back_color;
+            return sprite_color;
+        }
+
+        /// <summary>
         /// Подготовитеьные действия в начале кадра
         /// </summary>
         static void BeginFrame()
@@ -518,6 +541,8 @@ namespace NES
             screen_pos = 0;
             tile_x = 0;
             tile_y = 0;
+            sprite_overflow = false;
+            sprite_0_hit = false;
             address = MirrorAdr((ushort)(NAME_TABLE + nametable * 0x400));
         }
 
@@ -554,15 +579,23 @@ namespace NES
             byte low = memory[a];
             byte up = memory[a + 8];
 
-            int atr = GetAttribute();
-
             int l = (low >> (7 - tile_x)) & 1;
             int u = (up >> (7 - tile_x)) & 1;
 
             int color = l + (u << 1);
 
-            int pixel = GetPalettePixel(color, atr);
-            return pixel;
+            return color;
+        }
+
+        static int GetSpriteColor(int x)
+        {
+            foreach (Sprite sprite in sprites)
+            {
+                if (sprite.x > x-8 && sprite.x <= x)
+                {
+                    // TODO: проверить наложение спрайтов
+                }
+            }
         }
 
         /// <summary>
@@ -631,7 +664,14 @@ namespace NES
                 int x = OAM_memory[i * 4 + 3];
 
                 if (y <= line_y && y + sprite_height >= line_y)
-                    sprites.Add(new Sprite(x,y,tile,atr));
+                {
+                    if (sprites.Count >= 8)
+                    {
+                        sprite_overflow = true;
+                        return;
+                    }
+                    sprites.Add(new Sprite(x, y, tile, atr));
+                }
             }
         }
     }
