@@ -84,7 +84,19 @@ namespace NES
             return prg_mem.Skip<byte>(n * Memory.PRG_SIZE).Take(Memory.PRG_SIZE).ToArray();
         }
 
-        /// <summary>
+	/// <summary>
+        /// получить банк программы 32кб
+        /// </summary>
+        /// <param name="n">номер банка</param>
+        /// <returns>банк программы</returns>
+        public static byte[] GetPrgBank32(int n)
+        {
+            if (n < 0 || n >= prg_count)
+                return null;
+            return prg_mem.Skip<byte>(n * Memory.PRG_SIZE*2).Take(Memory.PRG_SIZE*2).ToArray();
+        }
+
+	/// <summary>
         /// получить банк изображений
         /// </summary>
         /// <param name="n">номер банка</param>
