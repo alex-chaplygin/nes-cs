@@ -23,8 +23,13 @@ namespace NES
           NROM,
           MMC1.Write,
 	  UxROM,
-	  CNROM
+	  CNROM,
+	  null,
+	  null,
+	  null,
+	  AxROM,
         };
+	
         /// <summary>
         /// Инициализация Mapper
         /// </summary>
@@ -58,6 +63,15 @@ namespace NES
 	static void CNROM(ushort adr, byte val)
         {
             PPU.WritePattern0(Cartridge.GetChrBank(val));
+        }
+
+	static void AxROM(ushort adr, byte val)
+        {
+            byte prg_rom_bank = (byte)(val & 7);
+            byte vram_page = (byte)(val >> 4 & 1);
+            Memory.WriteROM1(Cartridge.GetPrgBank32(prg_rom_bank));
+            if (vram_page == 1)
+                Cartridge.mirroring = Mirroring.Single;
         }
     }
 }
