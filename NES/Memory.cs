@@ -27,6 +27,11 @@ namespace NES
         public const int CHR_SIZE = 0x2000;
 
 	/// <summary>
+	/// 4 килобайтный банк изображения 
+	/// </summary>
+        public const int CHR_SIZE_4BYTES = 0x1000;
+	
+	/// <summary>
         /// размер оперативной памяти
         /// </summary>
         public const int RAM_SIZE = 0x800;
