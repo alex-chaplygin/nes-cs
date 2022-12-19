@@ -108,7 +108,20 @@ namespace NES
             return chr_mem.Skip<byte>(n * Memory.CHR_SIZE).Take(Memory.CHR_SIZE).ToArray();
         }
 
-        /// <summary>
+	/// <summary>
+        /// получить 4 килобайтный банк изоражения 
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static byte[] GetChrBank4bytes(int n)
+        {
+            if (n < 0 || n >= chr_count)
+                return null;
+            return chr_mem.Skip<byte>(n * Memory.CHR_SIZE_4BYTES).Take(Memory.CHR_SIZE_4BYTES).ToArray();
+
+        }
+
+	/// <summary>
         /// прочитать файл картриджа
         /// </summary>
         /// <param name="fileName">имя файла</param>
