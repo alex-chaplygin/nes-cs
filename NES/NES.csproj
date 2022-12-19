@@ -51,6 +51,7 @@
     <Compile Include="PPU.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Mappers\MMC1.cs" />
+    <Compile Include="APU\Divider.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
