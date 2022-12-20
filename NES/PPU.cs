@@ -265,9 +265,9 @@ namespace NES
         static Register[] memoryTable = new Register[]
         {
             new Register( 0x2000, null, ControllerWrite ),
-        new Register( 0x2001, null, MaskWrite ),
+	    new Register( 0x2001, null, MaskWrite ),
             new Register( 0x2002, StatusRead, null ),
-            //new Register( 0x2003, null, OAMadrWrite ),
+            new Register( 0x2003, null, OAMadrWrite ),
             new Register( 0x2004, OAMRead, OAMWrite ),
             new Register( 0x2005, null, SetScroll ),
             new Register( 0x2006, null, SetAddress ),
@@ -371,6 +371,16 @@ namespace NES
             OAM_memory[OAM_address++] = value;
         }
 
+	/// Подушкин Иван
+        /// <summary>
+        /// Задание адреса OAM
+        /// </summary>
+        /// <param name="value"></param>
+        public static void OAMadrWrite(byte value)
+        {
+            OAM_address = value;
+        }
+	
         /// <summary>
         ///   Чтение из памяти спрайтов
         /// </summary>
