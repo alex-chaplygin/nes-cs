@@ -6,33 +6,60 @@ using System.Threading.Tasks;
 
 namespace NES
 {
+    /// <summary>
+    /// Типы банков
+    /// </summary>
     public enum Banks
     {
         Chr0,
         Chr1,
         Prg
     }
+
     public class MMC1
     {
+        /// <summary>
+        /// Режимы PRG банков
+        /// </summary>
         enum PRGMode
         {
             Switch32,
             FixFirst,
             FixLast
         }
+	
+        /// <summary>
+        /// Режимы CHR банков
+        /// </summary>
         enum CHRmode 
         {
             Switch8,
             SwitchTwo4Banks
         }
 
+	/// <summary>
+        /// Функция переключения баков
+        /// </summary>
         delegate void SwitchOp();
-        struct SwitchReg
+
+	struct SwitchReg
         {
+            /// <summary>
+            /// Верхняя граница
+            /// </summary>
             public int up;
+
+            /// <summary>
+            /// Нижняя граница
+            /// </summary>
             public int down;
+
+            /// <summary>
+            /// Функция переключения
+            /// </summary>
             public SwitchOp bank;
-            public SwitchReg(int p ,int u, SwitchOp r)
+
+	    public SwitchReg(int p ,int u, SwitchOp r)
             {
                 up = p;
                 down = u;
@@ -40,14 +67,21 @@ namespace NES
             }
         }
 
-       
-
-        /// <summary>
-        /// Номер банка для переключения 
+	/// <summary>
+        /// Сдвиговый регистр
         /// </summary>
         public static byte registr = 0x10;
+
+	/// <summary>
+        /// Управляющий регистр
+        /// </summary>	
         public static byte control;
-        public static int bank;
+
+	/// <summary>
+        /// Номер банка для переключения 
+        /// </summary>
+	static byte bank;
+	
         public static Banks sw;
         static PRGMode prg_mode;
         static CHRmode chr_mode;
@@ -84,7 +118,9 @@ namespace NES
              
             }
         }
-
+        /// <summary>
+        /// Переключение банков Chr0
+        /// </summary>
         public static void Chr0()
         {
             sw = Banks.Chr0;
@@ -95,7 +131,9 @@ namespace NES
                 case CHRmode.SwitchTwo4Banks:PPU.WritePattern0(Cartridge.GetChrBank4bytes(bank)); break;
             }
         }
-
+        /// <summary>
+        /// Переключение банков Chr1
+        /// </summary>
         public static void Chr1()
         {
             sw = Banks.Chr1;
@@ -105,7 +143,9 @@ namespace NES
                 case CHRmode.SwitchTwo4Banks:PPU.WritePattern0(Cartridge.GetChrBank4bytes(bank)); break;
             }
         }
-
+        /// <summary>
+        /// Переключение банков Prg
+        /// </summary>
         public static void Prg()
         {
             sw = Banks.Prg;
@@ -121,7 +161,10 @@ namespace NES
             }
 
         }
-
+        /// <summary>
+        /// Управление переключением банков
+        /// </summary>
+        /// <param name="val"></param>
         public static void Control(byte val)
         {
             switch (val & 3) 
@@ -142,15 +185,18 @@ namespace NES
             chr_mode = (CHRmode)((val >> 4) & 1);
         }
 
+        /// <summary>
+        /// Функция переключения между  Chr0, Chr1 и Prg
+        /// </summary>
+        /// <param name="adr"></param>
         public static void Switch(ushort adr)
         {
             bank = registr;
             SwitchReg[] switchTable = new SwitchReg[]
-            {
-                
-                    new SwitchReg( 0xA000, 0xBFFF, Chr0 ),
-                    new SwitchReg (0xC000, 0xDFFF, Chr1 ),
-                    new SwitchReg(0xE000, 0xFFFF, Prg )
+            {                
+		new SwitchReg( 0xA000, 0xBFFF, Chr0 ),
+		new SwitchReg (0xC000, 0xDFFF, Chr1 ),
+		new SwitchReg(0xE000, 0xFFFF, Prg )
             };
 
             for (int i = 0; i < switchTable.Length; i++)
