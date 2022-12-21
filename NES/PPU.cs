@@ -265,7 +265,7 @@ namespace NES
         static Register[] memoryTable = new Register[]
         {
             new Register( 0x2000, null, ControllerWrite ),
-	    new Register( 0x2001, null, MaskWrite ),
+        new Register( 0x2001, null, MaskWrite ),
             new Register( 0x2002, StatusRead, null ),
             new Register( 0x2003, null, OAMadrWrite ),
             new Register( 0x2004, OAMRead, OAMWrite ),
@@ -274,6 +274,22 @@ namespace NES
             new Register( 0x2007, DataRead, DataWrite ),
             new Register( 0x4014, null, DMA )
         };
+
+        /// <summary>
+        /// Инициализация PPU
+        /// </summary>
+        public static void Init()
+        {
+            ControllerWrite(0x0);
+            MaskWrite(0x0);
+            vertical_blank = true;
+            sprite_0_hit = false;
+            sprite_overflow = true;
+            OAMadrWrite(0x0);
+            SetAddress(0x0);
+            SetScroll(0x0);
+            DataWrite(0x0);
+        }
 
         /// <summary>
         ///   Запись в регистр PPU
@@ -538,11 +554,23 @@ namespace NES
                 EvaluateSprites(i);
                 for (int j = 0; j < WIDTH; j++)
                 {
-                    int back_color = show_background ? GetTilePixel(memory[address], tile_x, tile_y, background_table) : 0;
+                    int back_color;
+                    int sprite_color;
+                    if (j < 8)
+                    {
+                        show_8_background = show_background ? show_8_background : false;
+                        back_color = show_8_background ? GetTilePixel(memory[address], tile_x, tile_y, background_table) : 0;
+                        show_8_sprites = show_sprites ? show_8_sprites : false;
+                        sprite_color = show_8_sprites ? GetSpriteColor(j, i) : 0;
+                    }
+                    else
+                    {
+                        back_color = show_background ? GetTilePixel(memory[address], tile_x, tile_y, background_table) : 0;
+                        sprite_color = show_sprites ? GetSpriteColor(j, i) : 0;
+                    }
                     int atr = GetAttribute();
-                    int sprite_color = show_sprites ? GetSpriteColor(j, i) : 0;
                     int color = Combine(back_color, sprite_color, ref atr);
-                    int pixel = GetPalettePixel(color, atr);
+                    int pixel = GetPalettePixel(color, atr, j);
                     RenderPixel(pixel);
                     tile_x++;
                     if (tile_x == 8)
@@ -574,11 +602,15 @@ namespace NES
         static void BeginFrame()
         {
             screen_pos = 0;
-            tile_x = 0;
-            tile_y = 0;
+            byte scroll_y = (byte)scroll;
+            byte scroll_x = (byte)(scroll >> 8);
+            byte coarse_x = (byte)(scroll_x >> 3);
+            byte coarse_y = (byte)(scroll_y >> 3);
+            tile_x = (byte)(scroll_x & 0x07);
+            tile_y = (byte)(scroll_y & 0x07);
             sprite_overflow = false;
             sprite_0_hit = false;
-            address = MirrorAdr((ushort)(NAME_TABLE + nametable * 0x400));
+            address = MirrorAdr((ushort)(NAME_TABLE + (nametable << 10) + (coarse_y << 5) + coarse_x));
         }
 
         /// <summary>
@@ -690,11 +722,11 @@ namespace NES
         /// <summary>
         /// Окраска пикселя по палитре
         /// </summary>
-        static int GetPalettePixel(int color, int palette)
+        static int GetPalettePixel(int color, int palette, int x)
         {
             if (color == 0)
             {
-                if (!show_background)
+                if (!show_background || !show_8_background && x < 8)
                     return 0x0d;
                 else
                     palette = 0;
