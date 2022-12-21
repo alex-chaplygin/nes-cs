@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,11 +23,26 @@ namespace NES
         const int ATTRIBUTE_GRID = 0x23C0;
         const int MAX_SPRITES = 64;
 
+        /// <summary>
+        /// структура видимого спрайта
+        /// </summary>
         struct Sprite
         {
+            /// <summary>
+            /// координат x левого верхнего угла спрайта
+            /// </summary>
             public int x;
+            /// <summary>
+            /// координата y левого верхнего угла срайта
+            /// </summary>
             public int y;
+            /// <summary>
+            /// номер тайла спрайта
+            /// </summary>
             public int tile;
+            /// <summary>
+            /// младшие два бита - номер палитры спрайта
+            /// </summary>
             public int atribute;
 
             public Sprite(int x, int y, int tile, int atribute)
@@ -59,7 +74,15 @@ namespace NES
         /// </summary>
         public static byte[] OAM_memory = new byte[OAM_SIZE];
 
+        /// <summary>
+        /// список рисуемых спрайтов
+        /// </summary>
         static List<Sprite> sprites = new List<Sprite>();
+
+        /// <summary>
+        /// текущий рисуемый спрайт
+        /// </summary>
+        static Sprite current_sprite;
 
         /// <summary>
         /// Палитра 64 цвета
@@ -242,9 +265,9 @@ namespace NES
         static Register[] memoryTable = new Register[]
         {
             new Register( 0x2000, null, ControllerWrite ),
-        new Register( 0x2001, null, MaskWrite ),
+	    new Register( 0x2001, null, MaskWrite ),
             new Register( 0x2002, StatusRead, null ),
-            //new Register( 0x2003, null, OAMadrWrite ),
+            new Register( 0x2003, null, OAMadrWrite ),
             new Register( 0x2004, OAMRead, OAMWrite ),
             new Register( 0x2005, null, SetScroll ),
             new Register( 0x2006, null, SetAddress ),
@@ -348,6 +371,16 @@ namespace NES
             OAM_memory[OAM_address++] = value;
         }
 
+	/// Подушкин Иван
+        /// <summary>
+        /// Задание адреса OAM
+        /// </summary>
+        /// <param name="value"></param>
+        public static void OAMadrWrite(byte value)
+        {
+            OAM_address = value;
+        }
+	
         /// <summary>
         ///   Чтение из памяти спрайтов
         /// </summary>
@@ -505,11 +538,11 @@ namespace NES
                 EvaluateSprites(i);
                 for (int j = 0; j < WIDTH; j++)
                 {
-                    int back_color = GetTilePixel(memory[address], background_table);
-                    int back_atr = GetAttribute();
-                    int sprite_color = GetSpriteColor(j);
-                    int color = Combine(back_color, sprite_color);
-                    int pixel = GetPalettePixel(color, back_atr);
+                    int back_color = show_background ? GetTilePixel(memory[address], tile_x, tile_y, background_table) : 0;
+                    int atr = GetAttribute();
+                    int sprite_color = show_sprites ? GetSpriteColor(j, i) : 0;
+                    int color = Combine(back_color, sprite_color, ref atr);
+                    int pixel = GetPalettePixel(color, atr);
                     RenderPixel(pixel);
                     tile_x++;
                     if (tile_x == 8)
@@ -525,11 +558,13 @@ namespace NES
         /// </summary>
         /// <param name="back_color">Цвет пикселя фона</param>
         /// <param name="sprite_color">Цвет пикселя спрайта</param>
+        /// <param name="atr">возвращаемый номер палитры для спрайта</param>
         /// <returns>Финальный цвет пикселя</returns>
-        static int Combine(int back_color, int sprite_color)
+        static int Combine(int back_color, int sprite_color, ref int atr)
         {
             if (sprite_color == 0)
                 return back_color;
+            atr = (current_sprite.atribute & 3) + 4;
             return sprite_color;
         }
 
@@ -573,7 +608,7 @@ namespace NES
         /// <summary>
         /// Получение текущего пикселя плитки
         /// </summary>
-        static int GetTilePixel(byte tile, int table)
+        static int GetTilePixel(byte tile, int tile_x, int tile_y, int table)
         {
             ushort a = GetTileAdr(tile, tile_y, table);
             byte low = memory[a];
@@ -587,15 +622,29 @@ namespace NES
             return color;
         }
 
-        static int GetSpriteColor(int x)
+
+        /// <summary>
+        /// получить точку всех наложенных спрайтов
+        /// </summary>
+        /// <param name="x">координата x экрана(от 0 до 255)</param>
+        /// <param name="y">координата y экрана(от 0 до 239)</param>
+        /// <returns></returns>
+        static int GetSpriteColor(int x, int y)
         {
             foreach (Sprite sprite in sprites)
             {
-                if (sprite.x > x-8 && sprite.x <= x)
+                if (sprite.x > x - 8 && sprite.x <= x)
                 {
-                    // TODO: проверить наложение спрайтов
+                    // проверить наложение спрайтов
+                    int color = GetTilePixel((byte)sprite.tile, x - sprite.x, y - sprite.y, sprite_table);
+                    if (color != 0)
+                    {
+                        current_sprite = sprite;
+                        return color;
+                    }
                 }
             }
+            return 0;
         }
 
         /// <summary>
@@ -644,7 +693,12 @@ namespace NES
         static int GetPalettePixel(int color, int palette)
         {
             if (color == 0)
-                palette = 0;
+            {
+                if (!show_background)
+                    return 0x0d;
+                else
+                    palette = 0;
+            }
             return memory[PALETTE + palette * 4 + color];
         }
 
@@ -663,7 +717,7 @@ namespace NES
                 int atr = OAM_memory[i * 4 + 2];
                 int x = OAM_memory[i * 4 + 3];
 
-                if (y <= line_y && y + sprite_height >= line_y)
+                if (y <= line_y && y + sprite_height - 1 >= line_y)
                 {
                     if (sprites.Count >= 8)
                     {
