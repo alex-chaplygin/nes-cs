@@ -11,24 +11,87 @@ namespace NES.APU
         /// <summary>
         /// Функцмя записи в APU 
         /// </summary>
-        /// <param name="adr">Адрес</param>
         /// <param name="val">Значение</param>
-        delegate void APUWrite(ushort adr, byte val);
+        delegate void APUWrite(byte val);
 
-        static APUWrite[] apu = new APUWrite[]
+	struct Register
         {
-        };
+            public int adr;
 
+            public APUWrite write;
+
+            public Register(int a, APUWrite w)
+            {
+                adr = a;
+                write = w;
+            }
+        }
+
+        static Register[] memoryTable = new Register[]
+        {
+            new Register( 0x4000,  Pulse1Timer ),
+            new Register( 0x4001, Pulse1Length ),
+            new Register( 0x4002, Pulse1Envelope ),
+            new Register( 0x4003, Pulse1Sweep ),
+            new Register( 0x4004,  Pulse2Timer ),
+            new Register( 0x4005, Pulse2Length ),
+            new Register( 0x4006, Pulse2Envelope ),
+            new Register( 0x4007, Pulse2Sweep ),
+        };
 
         /// <summary>
         /// Записать значения в APU
         /// </summary>
         /// <param name="adr">Адрес</param>
         /// <param name="val">Значнение</param>
-        public static void Write(ushort adr, byte val)
+        public static void Write(ushort adr, byte value)
+        {
+	    for (int i = 0; i < memoryTable.Length; i++)
+                if (adr == memoryTable[i].adr)
+                {
+                    memoryTable[i].write(value);
+                    return;
+                }            
+        }
+
+	static void Pulse1Timer(byte val)
         {
             
+        }
 
-        }        
+        static void Pulse1Length(byte val)
+        {
+
+        }
+
+	static void Pulse1Envelope(byte val)
+        {
+
+        }
+
+	static void Pulse1Sweep(byte val)
+        {
+
+        }
+
+	static void Pulse2Timer(byte val)
+        {
+
+        }
+
+	static void Pulse2Length(byte val)
+        {
+
+        }
+
+	static void Pulse2Envelope(byte val)
+        {
+
+        }
+
+	static void Pulse2Sweep(byte val)
+        {
+
+        }
     }
 }
