@@ -39,11 +39,10 @@ namespace NES.Mappers
 
         static SwitchReg[] switchTable = new SwitchReg[]
         {
-        new SwitchReg( 0x5100, PRGmode),
-        new SwitchReg( 0x5101, CHRmode),
-        new SwitchReg( 0x5102, PRGramp1),
-        new SwitchReg( 0x5103, PRGramp2),
-
+	    new SwitchReg( 0x5100, PRGmode),
+	    new SwitchReg( 0x5101, CHRmode),
+	    new SwitchReg( 0x5102, PRGramp1),
+	    new SwitchReg( 0x5103, PRGramp2),
         };
         public static void Write(ushort adr, byte val)
         {
