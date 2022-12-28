@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,6 +28,7 @@ namespace NES
         /// </summary>
         struct Sprite
         {
+            public int id;
             /// <summary>
             /// координат x левого верхнего угла спрайта
             /// </summary>
@@ -45,12 +46,13 @@ namespace NES
             /// </summary>
             public int atribute;
 
-            public Sprite(int x, int y, int tile, int atribute)
+            public Sprite(int x, int y, int tile, int atribute, int id)
             {
                 this.x = x;
                 this.y = y;
                 this.tile = tile;
                 this.atribute = atribute;
+                this.id = id;
             }
         } 
 
@@ -363,7 +365,7 @@ namespace NES
         /// <param name="bt"></param>
         public static void DataWrite(byte bt)
         {
-            memory[address] = bt;
+            memory[address & 0x3FFF] = bt;
             IncreaseAddress();
         }
 
@@ -496,9 +498,9 @@ namespace NES
             show_8_sprites = ((val >> 2) & 1) > 0;
             show_background = ((val >> 3) & 1) > 0;
             show_sprites = ((val >> 4) & 1) > 0;
-            red_available = ((val >> 5) & 1) > 0;
-            green_available = ((val >> 6) & 1) > 0;
-            blue_available = ((val >> 7) & 1) > 0;
+            red_available = true;// ((val >> 5) & 1) > 0;
+            green_available = true;// ((val >> 6) & 1) > 0;
+            blue_available = true;// ((val >> 7) & 1) > 0;
         }
 
         /// <summary>
@@ -590,10 +592,18 @@ namespace NES
         /// <returns>Финальный цвет пикселя</returns>
         static int Combine(int back_color, int sprite_color, ref int atr)
         {
-            if (sprite_color == 0)
+if (sprite_color == 0)
                 return back_color;
-            atr = (current_sprite.atribute & 3) + 4;
-            return sprite_color;
+            if (current_sprite.id == 0 && back_color != 0)
+                sprite_0_hit = true;
+            int ret = back_color == 0 ? sprite_color : back_color;
+            if (!GetPriority(current_sprite))
+            {
+                atr = (current_sprite.atribute & 3) + 4;
+                return sprite_color;
+            }
+            else
+		return ret;
         }
 
         /// <summary>
@@ -663,12 +673,15 @@ namespace NES
         /// <returns></returns>
         static int GetSpriteColor(int x, int y)
         {
+            int sprite_height = sprite_size * 8 + 7;
             foreach (Sprite sprite in sprites)
             {
                 if (sprite.x > x - 8 && sprite.x <= x)
                 {
                     // проверить наложение спрайтов
-                    int color = GetTilePixel((byte)sprite.tile, x - sprite.x, y - sprite.y, sprite_table);
+                    int color = GetTilePixel((byte)sprite.tile,
+                        GetHFlip(sprite) ? 7 - x + sprite.x : x - sprite.x,
+                        GetVFlip(sprite) ? sprite_height - y + sprite.y : y - sprite.y, sprite_table);
                     if (color != 0)
                     {
                         current_sprite = sprite;
@@ -756,9 +769,50 @@ namespace NES
                         sprite_overflow = true;
                         return;
                     }
-                    sprites.Add(new Sprite(x, y, tile, atr));
+                    sprites.Add(new Sprite(x, y, tile, atr, i));
                 }
             }
+        }
+        public static void VBlankStart()
+        {
+            vertical_blank = true;
+            if (generate_nmi)
+                CPU.Interrupt(Interruption.NMI);
+        }
+        public static void VBlankStop()
+        {
+            vertical_blank = false;
+            sprite_0_hit = false;
+        }
+
+        /// <summary>
+        /// возвращает аттрибут спрайта - поворот по горизонтали
+        /// </summary>
+        /// <param name="s">Спрайт</param>
+        /// <returns></returns>
+        static bool GetHFlip(Sprite s)
+        {
+            return Convert.ToBoolean((s.atribute >> 6) & 1);
+        }
+
+        /// <summary>
+        /// возвращает аттрибут спрайта - поворот по вертикали
+        /// </summary>
+        /// <param name="s">Спрайт</param>
+        /// <returns></returns>
+        static bool GetVFlip(Sprite s)
+        {
+            return Convert.ToBoolean(s.atribute >> 7);
+        }
+
+        /// <summary>
+        /// возвращает аттрибут спрайта - приоритет
+        /// </summary>
+        /// <param name="s">Спрайт</param>
+        /// <returns>true- спрайт перед фоном, false - спрайт позади фона </returns>
+        static bool GetPriority(Sprite s)
+        {
+            return Convert.ToBoolean((s.atribute >> 5) & 1);
         }
     }
 }

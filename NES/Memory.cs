@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -133,7 +133,7 @@ namespace NES
 	public static ushort ReadWord(ushort adr)
 	{
 	    if ((adr & 0x00FF) == 0x00FF)
-		return (ushort)(Read((ushort)(adr & 0xFF00)));
+		return (ushort)(Read((ushort)(adr & 0xFF00)) << 8);
 	    else
 		return (ushort)((Read((ushort)(adr + 1)) << 8) | Read(adr));
 	}

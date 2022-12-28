@@ -150,6 +150,7 @@ namespace NES
                     trainer_mem = reader.ReadBytes(trainer ? 512 : 0);
                     prg_mem = reader.ReadBytes(prg_count * Memory.PRG_SIZE);
                     chr_mem = reader.ReadBytes(chr_count * Memory.CHR_SIZE);
+		    mapper = header[6] >> 4;
                 }
             }
             return true;

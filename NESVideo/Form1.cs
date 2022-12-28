@@ -28,7 +28,9 @@ namespace NESVideo
             Cartridge.ReadFile(openFileDialog1.FileName);
 	        Memory.WriteROM1(Cartridge.GetPrgBank(0));            
             Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count-1));
-	        PPU.WritePattern0(Cartridge.GetChrBank(0));
+	        if (Cartridge.chr_count > 0)
+            PPU.WritePattern0(Cartridge.GetChrBank(0));
+            CPU.Interrupt(Interruption.RESET);
             timer1.Start();
 	}
 
@@ -60,6 +62,11 @@ namespace NESVideo
             int cycles = 0;
             while (cycles < 29780)
                 cycles += CPU.Step();
+            PPU.VBlankStart();
+            cycles = 0;
+            while (cycles < 4780)
+                cycles += CPU.Step();
+            PPU.VBlankStop();
             Refresh();
         }
 
