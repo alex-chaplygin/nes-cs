@@ -592,13 +592,18 @@ namespace NES
         /// <returns>Финальный цвет пикселя</returns>
         static int Combine(int back_color, int sprite_color, ref int atr)
         {
-            if (sprite_color == 0)
+if (sprite_color == 0)
                 return back_color;
             if (current_sprite.id == 0 && back_color != 0)
                 sprite_0_hit = true;
-                
-            atr = (current_sprite.atribute & 3) + 4;
-            return sprite_color;
+            int ret = back_color == 0 ? sprite_color : back_color;
+            if (!GetPriority(current_sprite))
+            {
+                atr = (current_sprite.atribute & 3) + 4;
+                return sprite_color;
+            }
+            else
+		return ret;
         }
 
         /// <summary>
