@@ -803,8 +803,17 @@ namespace NES
         {
             byte val = is_accum ? A : Memory.Read(adr);
             carry_flag = (val >> 7) == 1;
-            A = (byte)(val << 1);
-            SetZeroNeg(A);
+	    if (is_accum)
+	    {
+		A = (byte)(val << 1);
+		SetZeroNeg(A);
+	    }
+	    else
+	    {
+		val <<= 1;
+		Memory.Write(adr, val);
+		SetZeroNeg(val);
+	    }
             //Console.Write("ASL");
         }
 
