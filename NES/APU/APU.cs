@@ -45,7 +45,68 @@ namespace NES.APU
         }
 
 	/// <summary>
-        /// Функцмя записи в APU 
+        /// Импульсный канал
+        /// </summary>
+        struct Pulse
+        {
+            /// <summary>
+            /// режим
+            /// </summary>
+            public int duty;
+
+            /// <summary>
+            /// окутывать цыкл
+            /// </summary>
+            public int envelopeLoop;
+
+            /// <summary>
+            /// постоянная громкость
+            /// </summary>
+            public int constantVolume;
+
+            /// <summary>
+            /// громкость
+            /// </summary>
+            public int volume;
+
+            /// <summary>
+            /// отключённый
+            /// </summary>
+            public int enabled;
+
+            /// <summary>
+            /// период
+            /// </summary>
+            public int period;
+
+            /// <summary>
+            /// отрицать
+            /// </summary>
+            public int negate;
+
+            /// <summary>
+            /// сдвиг
+            /// </summary>
+            public int shift;
+
+            /// <summary>
+            /// низкий таймер
+            /// </summary>
+            public int timerLow;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public int lengthCounterLoad;
+
+            /// <summary>
+            /// высокий таймер
+            /// </summary>
+            public int timerHigh;
+        }
+	
+	/// <summary>
+        /// Функция записи в APU 
         /// </summary>
         /// <param name="val">Значение</param>
         delegate void APUWrite(byte val);
