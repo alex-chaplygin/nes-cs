@@ -9,6 +9,31 @@ namespace NES.APU
     class APU
     {
 	/// <summary>
+	/// флаг Pulse1
+	/// </summary>
+	static bool enablePulse1;
+
+	/// <summary>
+	/// флаг Pulse2
+	/// </summary>
+	static bool enablePulse2;
+
+	/// <summary>
+	/// флаг Triangle
+	/// </summary>
+	static bool enableTriangle;
+
+	/// <summary>
+	/// флаг Noise
+	/// </summary>
+	static bool enableNoise;
+
+	/// <summary>
+	/// флаг DMC
+	/// </summary>
+	static bool enableDMC;
+	
+	/// <summary>
         /// Канал проигрывания звуковых отсчетов с delta модуляцией
         /// </summary>
         struct DMC
@@ -134,6 +159,7 @@ namespace NES.APU
             new Register( 0x4005, Pulse2Length ),
             new Register( 0x4006, Pulse2Envelope ),
             new Register( 0x4007, Pulse2Sweep ),
+	    new Register( 0x4015, StatusWrite ),
         };
 
         /// <summary>
@@ -151,6 +177,19 @@ namespace NES.APU
                 }            
         }
 
+	/// <summary>
+        /// Функция установки флагов каналов
+        /// </summary>
+        /// <param name="val"></param>
+        public static void StatusWrite(byte val)
+        {
+            enablePulse1 = (val & 0x01) != 0;
+            enablePulse2 = (val & 0x02) != 0;
+            enableTriangle = (val & 0x04) != 0;
+            enableNoise = (val & 0x08) != 0;
+            enableDMC = (val & 0x10) != 0;
+        }
+	
 	static void Pulse1Timer(byte val)
         {
             
