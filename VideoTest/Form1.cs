@@ -21,12 +21,13 @@ namespace VideoTest
             Height = 720 + 37;
 
             PPU.MaskWrite(0xFE);
-            Memory.Write(0x2000, 0x22);
+            Memory.Write(0x2000, 0x01);
             Memory.Write(0x2001, 0xFE);
             SetupTiles();
             SetupPalette();
             SetupNames();
             SetupSprites();
+	    SetupScroll();
             Cartridge.mirroring = Mirroring.FourScreen;
         }
 
@@ -136,6 +137,12 @@ namespace VideoTest
             Memory.Write(0x2004, 125);*/
         }
 
+        static void SetupScroll()
+        {
+	    Memory.Write(0x2005, 125);
+            Memory.Write(0x2005, 0);
+	}
+	
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             unsafe
