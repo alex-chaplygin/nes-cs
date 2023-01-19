@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace NES
 {
-    /// <summary>
-    /// Типы банков
-    /// </summary>
-    public enum Banks
-    {
-        Chr0,
-        Chr1,
-        Prg
-    }
-
     public class MMC1
     {
         /// <summary>
+        /// Типы банков
+        /// </summary>
+        enum Banks
+        {
+            Chr0,
+            Chr1,
+            Prg
+        }
+
+	/// <summary>
         /// Режимы PRG банков
         /// </summary>
-        enum PRGMode
+        public enum PRGMode
         {
             Switch32,
             FixFirst,
@@ -42,7 +42,7 @@ namespace NES
         /// </summary>
         delegate void SwitchOp();
 
-	struct SwitchReg
+        struct SwitchReg
         {
             /// <summary>
             /// Верхняя граница
@@ -59,113 +59,134 @@ namespace NES
             /// </summary>
             public SwitchOp bank;
 
-	    public SwitchReg(int p ,int u, SwitchOp r)
+
+            public SwitchReg(int p, int u, SwitchOp r)
             {
                 up = p;
                 down = u;
                 bank = r;
             }
         }
-
 	/// <summary>
         /// Сдвиговый регистр
         /// </summary>
-        public static byte registr = 0x10;
+         public static byte registr = 0x10;
 
 	/// <summary>
         /// Управляющий регистр
         /// </summary>	
-        public static byte control;
+         static byte control;
 
 	/// <summary>
         /// Номер банка для переключения 
         /// </summary>
-	static byte bank;
+	static byte bank = 2;
 	
-        public static Banks sw;
+        static Banks sw;
         static PRGMode prg_mode;
         static CHRmode chr_mode;
-        public static void Write(ushort adr, byte val)
-        {
-            if (0x8000 <= adr && adr <= 0x9FFF)
-                Control(val);
 
-            Console.WriteLine($"val = {val:x}");
-            if ((val & 0x80) > 0)
-            {
-                registr = 0x10;
-                Control((byte) (control | 0x0C));
+	public static void Write(ushort adr, byte val)
+        {
+            if (0x8000 <= adr && adr <= 0x9FFF && (val & 0x80) == 0)
+            { 
+                Control(val);
+                return;
             }
-                
-             else if ((registr & 1) > 0)
-            {
-                registr >>= 1;
-                val &= 1;
-                val <<= 4;
-                registr |= val;
-                Console.WriteLine($"switch val = {val:x} reg = {registr:X}");
-                // переключение
-                Switch(adr);
-                registr = 0x10;
-            }
-            else
-            {
-                registr >>= 1;
-                val &= 1;
-                val <<= 4;
-                registr |= val;
-                Console.WriteLine($"val = {val:x} reg = {registr:X}");
-             
-            }
+
+                Console.WriteLine($" first val = {val:x}");
+                if ((val & 0x80) > 0)
+                {
+                    registr = 0x10;
+                    Control((byte)(control | 0x0C));
+                    Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1));
+                    Console.WriteLine("this is 0");
+                }
+                else if ((registr & 1) > 0)
+                {
+                    registr >>= 1;
+                    val &= 1;
+                    val <<= 4;
+                    registr |= val;
+                    Console.WriteLine($"1.switch val = {val:x} reg = {registr:X}");
+                    // переключение
+                    Switch(adr);
+                    registr = 0x10;
+                }
+                else
+                {
+                    registr >>= 1;
+                    val &= 1;
+                    val <<= 4;
+                    registr |= val;
+                    Console.WriteLine($"2.val = {val:x} reg = {registr:X}");
+            
+                }
+            
         }
+
         /// <summary>
         /// Переключение банков Chr0
         /// </summary>
-        public static void Chr0()
+        static void Chr0()
         {
             sw = Banks.Chr0;
-	        PPU.WritePattern0(Cartridge.GetChrBank(bank));
             switch (chr_mode) 
             { 
-                case CHRmode.Switch8: PPU.WritePattern0(Cartridge.GetChrBank(bank & 0xE));break;
-                case CHRmode.SwitchTwo4Banks:PPU.WritePattern0(Cartridge.GetChrBank4bytes(bank)); break;
+                case CHRmode.Switch8: PPU.WritePattern0(Cartridge.GetChrBank4bytes(bank & 0xE));
+                    PPU.WritePattern1(Cartridge.GetChrBank4bytes((bank & 0xE) + 1));
+                    Console.WriteLine("CHR0 = sw8");
+                    break;
+                case CHRmode.SwitchTwo4Banks:PPU.WritePattern0(Cartridge.GetChrBank4bytes(bank));
+                    Console.WriteLine("CHR0 = swTwo4");
+                    break;
             }
         }
+
         /// <summary>
         /// Переключение банков Chr1
         /// </summary>
-        public static void Chr1()
+        static void Chr1()
         {
             sw = Banks.Chr1;
-	        PPU.WritePattern1(Cartridge.GetChrBank(bank));
             switch (chr_mode)
             {
-                case CHRmode.SwitchTwo4Banks:PPU.WritePattern0(Cartridge.GetChrBank4bytes(bank)); break;
+                case CHRmode.SwitchTwo4Banks:PPU.WritePattern1(Cartridge.GetChrBank4bytes(bank));
+                    Console.WriteLine("CHR1 = swTwo4");
+                    break;
             }
         }
+
         /// <summary>
         /// Переключение банков Prg
         /// </summary>
-        public static void Prg()
+        static void Prg()
         {
             sw = Banks.Prg;
             switch (prg_mode) 
             {
                 case PRGMode.Switch32:
                     Memory.WriteROM1(Cartridge.GetPrgBank(bank & 0xE));
-                    Memory.WriteROM2(Cartridge.GetPrgBank((bank & 0xE) + 1));break;
+                    Memory.WriteROM2(Cartridge.GetPrgBank((bank & 0xE) + 1));
+                    Console.WriteLine("Установился режим PRG = 1");
+                    break;
                 case PRGMode.FixFirst: Memory.WriteROM1(Cartridge.GetPrgBank(0));
-                    Memory.WriteROM2(Cartridge.GetPrgBank(bank)); break;
+                    Memory.WriteROM2(Cartridge.GetPrgBank(bank));
+                    Console.WriteLine("Установился режим PRG = 2");
+                        break;
                 case PRGMode.FixLast: Memory.WriteROM1(Cartridge.GetPrgBank(bank));
-                    Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1)); break;
+                    Memory.WriteROM2(Cartridge.GetPrgBank(Cartridge.prg_count - 1));
+                    Console.WriteLine("Установился режим PRG = 3");
+                        break;
             }
 
         }
-        /// <summary>
+
+	/// <summary>
         /// Управление переключением банков
         /// </summary>
         /// <param name="val"></param>
-        public static void Control(byte val)
+        static void Control(byte val)
         {
             switch (val & 3) 
             {
@@ -189,14 +210,14 @@ namespace NES
         /// Функция переключения между  Chr0, Chr1 и Prg
         /// </summary>
         /// <param name="adr"></param>
-        public static void Switch(ushort adr)
+        static void Switch(ushort adr)
         {
             bank = registr;
             SwitchReg[] switchTable = new SwitchReg[]
             {                
-		new SwitchReg( 0xA000, 0xBFFF, Chr0 ),
-		new SwitchReg (0xC000, 0xDFFF, Chr1 ),
-		new SwitchReg(0xE000, 0xFFFF, Prg )
+		       new SwitchReg( 0xA000, 0xBFFF, Chr0 ),
+		       new SwitchReg (0xC000, 0xDFFF, Chr1 ),
+		       new SwitchReg(0xE000, 0xFFFF, Prg )
             };
 
             for (int i = 0; i < switchTable.Length; i++)
