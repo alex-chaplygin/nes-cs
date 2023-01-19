@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -217,15 +217,16 @@ namespace NES
         public static bool vertical_blank;
 
         /// <summary>
-        ///   Координата x тайла.
+        ///   Координата x внутри тайла от 0 до 7.
         /// </summary>
         static byte tile_x;
 
 
         /// <summary>
-        ///   Координата y тайла.
+        ///   Координата y внутри тайла от 0 до 7.
         /// </summary>
         static byte tile_y;
+
 
         /// <summary>
         /// Функция чтения из памяти
@@ -623,13 +624,20 @@ if (sprite_color == 0)
             address = MirrorAdr((ushort)(NAME_TABLE + (nametable << 10) + (coarse_y << 5) + coarse_x));
         }
 
+
         /// <summary>
         /// Перейти на следующую плитку
         /// </summary>
         static void NextTile()
         {
+            if (GetCurX() == 31)
+            {
+                address = (ushort)(address ^ 0x400);
+                address = (ushort)(address & 0xFFE0);
+            }
+            else
+                address++;
             tile_x = 0;
-            address++;
         }
 
         /// <summary>
