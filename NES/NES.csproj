@@ -53,6 +53,8 @@
     <Compile Include="Mappers\MMC1.cs" />
     <Compile Include="Mappers\MMC2.cs" />
     <Compile Include="APU\Divider.cs" />
+    <Compile Include="APU\APU.cs" />
+    <Compile Include="APU\LengthCounter.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
