@@ -473,6 +473,66 @@ namespace NES
             generate_nmi = ((val >> 7) & 1) > 0;
         }
 
+	delegate ushort MirrorReturn(ushort adr);
+	struct MirAdr
+        {
+            public ushort adr;
+
+            public MirrorReturn ret;
+
+            public MirAdr(ushort a, MirrorReturn r)
+            {
+                adr = a;
+                ret = r;
+            }
+        }
+	
+	static MirAdr[] mirroringTable = new MirAdr[]
+        {
+            new MirAdr(0x2FFF, MirrorAdrType),
+            new MirAdr(0x3EFF, MirrorOnMir),
+            new MirAdr(0x3F1F, MirrorPalRAM),
+            new MirAdr(0x3FFF, MirrorOnPalRAM)
+        };
+
+	static ushort MirrorAdrType(ushort adr)
+        {
+
+            if (Cartridge.mirroring == Mirroring.Horisontal)
+                if (((adr >= 0x2400) && (adr < 0x2800)) || (adr >= 0x2C00))
+                    adr -= 0x400;
+            if (Cartridge.mirroring == Mirroring.Vertical)
+                if (adr >= 0x2800)
+                    adr -= 0x800;
+            if (Cartridge.mirroring == Mirroring.Single)
+                if (adr >= 0x2400)
+                {
+                    while (adr >= 0x2400)
+                        adr -= 0x400;
+                }
+            return adr;
+        }
+
+        static ushort MirrorOnMir(ushort adr)
+        {
+            adr -= 0x1000;
+            return MirrorAdrType(adr);
+        }
+
+	static ushort MirrorPalRAM(ushort adr)
+        {
+            if ((adr == 0x3F10) || (adr == 0x3F14) || (adr == 0x3F18) || (adr == 0x3F1C))
+                adr -= 0x10;
+            return adr;
+        }
+
+	static ushort MirrorOnPalRAM(ushort adr)
+        {
+            while(adr >= 0x3F1F)
+                adr -= 0x20;
+            return adr;
+        }
+	
         /// <summary>
         /// Вычисляет настоящий адрес на основе зеркалированного адреса
         /// </summary>
@@ -480,12 +540,14 @@ namespace NES
         /// <returns>Настоящий адрес</returns>
         public static ushort MirrorAdr(ushort adr)
         {
-            if (Cartridge.mirroring == Mirroring.Horisontal)
+            for(int i = 0; i < mirroringTable.Length; i++)
             {
-                if (((adr >= 0x2400) && (adr < 0x2800)) || (adr >= 0x2C00))
-                    adr -= 0x400;
+                if(adr <= mirroringTable[i].adr)
+                {
+                    return mirroringTable[i].ret(adr);
+                }
             }
-            return adr;
+            return 0;
         }
 
         /// <summary>
