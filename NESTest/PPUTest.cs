@@ -90,15 +90,31 @@ namespace NESTest
         [TestMethod]
         public void MirrorTest()
         {
-            Cartridge.mirroring = Mirroring.Horisontal;
+	    Cartridge.mirroring = Mirroring.Horisontal;
             ushort adr = 0x2400;
             
-            Assert.AreEqual(0x2000, PPU.MirrorAdr(adr));
-            Assert.AreEqual(0x1000, PPU.MirrorAdr(0x1000));
-            Assert.AreEqual(0x23FF, PPU.MirrorAdr(0x23FF));
-            Assert.AreEqual(0x23FF, PPU.MirrorAdr(0x27FF));
-            Assert.AreEqual(0x2BFF, PPU.MirrorAdr(0x2FFF));
-            Assert.AreEqual(0x3F00, PPU.MirrorAdr(0x3F00));
+            Assert.AreEqual(0x2000, PPU.MirroringGet(adr));
+            Assert.AreEqual(0x1000, PPU.MirroringGet(0x1000));
+            Assert.AreEqual(0x23FF, PPU.MirroringGet(0x23FF));
+            Assert.AreEqual(0x23FF, PPU.MirroringGet(0x27FF));
+            Assert.AreEqual(0x2BFF, PPU.MirroringGet(0x2FFF));
+            Assert.AreEqual(0x3F00, PPU.MirroringGet(0x3F00));
+
+            Cartridge.mirroring = Mirroring.Vertical;
+
+            Assert.AreEqual(0x2400, PPU.MirroringGet(0x2C00));
+            Assert.AreEqual(0x23FF, PPU.MirroringGet(0x2BFF));
+
+            Assert.AreEqual(0x3F00, PPU.MirroringGet(0x3F10));
+            Assert.AreEqual(0x3F04, PPU.MirroringGet(0x3F14));
+            Assert.AreEqual(0x3F08, PPU.MirroringGet(0x3F18));
+            Assert.AreEqual(0x3F0C, PPU.MirroringGet(0x3F1C));
+
+            Cartridge.mirroring = Mirroring.Single;
+
+            Assert.AreEqual(0x2000, PPU.MirroringGet(0x2400));
+            Assert.AreEqual(0x21F7, PPU.MirroringGet(0x29F7));
+            Assert.AreEqual(0x23FF, PPU.MirroringGet(0x2FFF));
         }
 
 	[TestMethod]
