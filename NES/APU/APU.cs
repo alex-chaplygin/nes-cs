@@ -129,6 +129,37 @@ namespace NES.APU
             /// </summary>
             public int timerHigh;
         }
+
+	/// <summary>
+        /// Треугольный канал создаёт квантовую треугольную волну 
+        /// </summary>
+        struct Triangle
+        {
+            /// <summary>
+            /// остановщик счетика длинны 
+            /// </summary>
+            public int lengthCounterHalt;
+
+            /// <summary>
+            /// линейная встречная нагрузка
+            /// </summary>
+            public int linearCounterLoad;
+
+            /// <summary>
+            /// таймер низких
+            /// </summary>
+            public int timerLow;
+
+            /// <summary>
+            /// длина встречной нагрузки
+            /// </summary>
+            public int lengthCounterLoad;
+
+            /// <summary>
+            /// таймер выскокий 
+            /// </summary>
+            public int timerHigh;
+        }
 	
 	/// <summary>
         /// Функция записи в APU 
