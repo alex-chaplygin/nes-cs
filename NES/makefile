@@ -1,4 +1,4 @@
-src=Memory.cs Program.cs CPU.cs Cartridge.cs Mapper.cs PPU.cs Input.cs Mappers/MMC1.cs Mappers/MMC2.cs APU/Divider.cs APU/APU.cs
+src=Memory.cs Program.cs CPU.cs Cartridge.cs Mapper.cs PPU.cs Input.cs Mappers/MMC1.cs Mappers/MMC2.cs APU/Divider.cs APU/APU.cs APU/DMC.cs APU/LengthCounter.cs
 
 all: /tmp/Program.exe
 

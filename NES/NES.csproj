@@ -55,6 +55,7 @@
     <Compile Include="APU\Divider.cs" />
     <Compile Include="APU\APU.cs" />
     <Compile Include="APU\LengthCounter.cs" />
+    <Compile Include="APU\DMC.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

@@ -34,42 +34,6 @@ namespace NES.APU
 	static bool enableDMC;
 	
 	/// <summary>
-        /// Канал проигрывания звуковых отсчетов с delta модуляцией
-        /// </summary>
-        struct DMC
-        {
-            /// <summary>
-            /// Флаг IRQ
-            /// </summary>
-            public bool irq_flag;
-
-            /// <summary>
-            /// Флаг цикла
-            /// </summary>
-            public bool loop_flag;
-
-            /// <summary>
-            /// Индекс частоты
-            /// </summary>
-            public int rate_index;
-
-            /// <summary>
-            /// выходной уровень (громкость канала)
-            /// </summary>
-            public Byte sirect_load;
-
-            /// <summary>
-            /// адрес отсчётов
-            /// </summary>
-            public ushort sample_address;
-
-            /// <summary>
-            /// длина отсчётов
-            /// </summary>
-            public int sample_length;
-        }
-
-	/// <summary>
         /// Импульсный канал
         /// </summary>
         struct Pulse
@@ -190,6 +154,10 @@ namespace NES.APU
             new Register( 0x4005, Pulse2Length ),
             new Register( 0x4006, Pulse2Envelope ),
             new Register( 0x4007, Pulse2Sweep ),
+	    new Register( 0x4010, DMC.FlagsandRate),
+            new Register( 0x4011, DMC.Directload ),
+            new Register( 0x4012, DMC.Sampleaddress ),
+            new Register( 0x4013, DMC.Samplelength ),
 	    new Register( 0x4015, StatusWrite ),
         };
 
