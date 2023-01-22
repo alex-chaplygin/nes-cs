@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -76,11 +76,11 @@ namespace NES
         /// Управляющий регистр
         /// </summary>	
          static byte control;
-
-	/// <summary>
+	
+        /// <summary>
         /// Номер банка для переключения 
         /// </summary>
-	static byte bank = 2;
+        static byte bank;
 	
         static Banks sw;
         static PRGMode prg_mode;
@@ -151,6 +151,7 @@ namespace NES
             sw = Banks.Chr1;
             switch (chr_mode)
             {
+                case CHRmode.Switch8:
                 case CHRmode.SwitchTwo4Banks:PPU.WritePattern1(Cartridge.GetChrBank4bytes(bank));
                     Console.WriteLine("CHR1 = swTwo4");
                     break;
