@@ -26,5 +26,10 @@ namespace NES
 		return false;
 	    }
 	}
+
+	public void Reset()
+        {
+	    counter = period;
+        }
     }
 } 
