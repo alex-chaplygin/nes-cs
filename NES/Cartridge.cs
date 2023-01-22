@@ -122,6 +122,32 @@ namespace NES
         }
 
 	/// <summary>
+        /// получить банк памяти заданного размера
+        /// </summary>
+        /// <param name="n">номер банка</param>
+        /// <param name="s">размер банка</param>
+        /// <returns>банк программы</returns>
+        public static byte[] GetPRGBank(int n, int s)
+        {            
+            if (n < 0 || n >= prg_count)
+                return null;      
+            return prg_mem.Skip<byte>(n * s).Take(s).ToArray();
+        }
+
+        /// <summary>
+        /// получить банк изображения заданного размера
+        /// </summary>
+        /// <param name="n">номер банка</param>
+        /// <param name="s">размер банка</param>
+        /// <returns>банк изображения</returns>
+        public static byte[] GetCHRBank(int n, int s)
+        {
+            if (n < 0 || n >= chr_count)
+                return null;
+            return chr_mem.Skip<byte>(n * s).Take(s).ToArray();
+        }
+	
+	/// <summary>
         /// прочитать файл картриджа
         /// </summary>
         /// <param name="fileName">имя файла</param>
