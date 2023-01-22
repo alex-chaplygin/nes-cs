@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -499,17 +499,23 @@ namespace NES
         {
 
             if (Cartridge.mirroring == Mirroring.Horisontal)
+            {
                 if (((adr >= 0x2400) && (adr < 0x2800)) || (adr >= 0x2C00))
                     adr -= 0x400;
-            if (Cartridge.mirroring == Mirroring.Vertical)
+            }
+            else if (Cartridge.mirroring == Mirroring.Vertical)
+            {
                 if (adr >= 0x2800)
                     adr -= 0x800;
-            if (Cartridge.mirroring == Mirroring.Single)
+            }
+            else if (Cartridge.mirroring == Mirroring.Single)
+            {
                 if (adr >= 0x2400)
                 {
                     while (adr >= 0x2400)
                         adr -= 0x400;
                 }
+            }
             return adr;
         }
 
@@ -788,7 +794,7 @@ if (sprite_color == 0)
         {
             int x = GetCurX();
             int y = GetCurY();
-            byte attr = memory[0x3c0 + NAME_TABLE + nametable * 0x400 + x / 4  + y / 4 * 8];
+            byte attr = memory[MirrorAdr((ushort)(0x3c0 + NAME_TABLE + nametable * 0x400 + x / 4 + y / 4 * 8))];
             //int b2 = attr / 8 % 8;
 
             int ix = x % 4;
