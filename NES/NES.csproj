@@ -56,6 +56,7 @@
     <Compile Include="APU\APU.cs" />
     <Compile Include="APU\LengthCounter.cs" />
     <Compile Include="APU\DMC.cs" />
+    <Compile Include="APU\Sequencer.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
