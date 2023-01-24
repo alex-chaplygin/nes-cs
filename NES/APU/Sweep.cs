@@ -6,45 +6,88 @@ using System.Threading.Tasks;
 
 namespace NES.APU
 {
-    /// <summary>
-    /// Класс для периодической измены периода для прямоугольного Pulse канала
-    /// </summary>
-    class Sweep {
 	/// <summary>
-	/// Делитель, который отсчитывает такты
+	/// Класс для периодической измены периода для прямоугольного Pulse канала
 	/// </summary>
-	Divider divider;
-
-	/// <summary>
-	/// Включен/выключен
-	/// </summary>
-	bool enable;
-
-	/// <summary>
-	/// Период
-	/// </summary>
-	int period;
-
-	/// <summary>
-	/// Инвертировать сдвиг
-	/// </summary>
-	bool negate;
-
-	/// <summary>
-	/// Число бит сдвига периода
-	/// </summary>
-	int shift;
-
-	/// <summary>
-	/// Инициализируем объект Sweep
-	/// </summary>
-	public Sweep(int dividerValue)
+	class Sweep
 	{
-	    divider = new Divider(dividerValue);
-	    enable = false;
-	    period = 0;
-	    negate = false;
-	    shift = 0;
+		/// <summary>
+		/// Делитель, который отсчитывает такты
+		/// </summary>
+		Divider divider;
+
+		/// <summary>
+		/// Включен/выключен
+		/// </summary>
+		bool enable;
+
+		/// <summary>
+		/// Период
+		/// </summary>
+		int period;
+
+		/// <summary>
+		/// Инвертировать сдвиг
+		/// </summary>
+		bool negate;
+
+		/// <summary>
+		/// Число бит сдвига периода
+		/// </summary>
+		int shift;
+
+		/// <summary>
+		/// Инициализируем объект Sweep по входному значению типа byte
+		/// </summary>
+		public Sweep(byte value)
+		{
+			/// <summary>
+			/// 7й бит
+			/// </summary>
+			enable = (value & (1 << 7)) != 0;
+
+			/// <summary>
+			/// 6-4й бит
+			/// </summary>
+			period = (value >> 4) & 0x07;
+			divider = new Divider(period);
+			/// <summary>
+			/// 3й бит
+			/// </summary>
+			negate = (value & (1 << 3)) != 0;
+
+			/// <summary>
+			/// 2-0й бит
+			/// </summary>
+			shift = value & 0x07;
+		}
+
+		public void Start()
+		{
+			enable = true;
+		}
+
+		public void Stop()
+		{
+			enable = false;
+		}
+
+		/// <summary>
+		/// Обновляем период делителя
+		/// </summary>
+		public void UpdatePeriod()
+		{
+			if (enable)
+			{
+				if (negate)
+				{
+					period -= shift;
+				}
+				else
+				{
+					period += shift;
+				}
+			}
+		}
 	}
-    }
 }
