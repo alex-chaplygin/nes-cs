@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,11 +40,34 @@ namespace NES.APU
         static int sample_length;
 
         /// <summary>
-        /// Метод для 0x4010
+        /// прерывание вкл
+        /// </summary>
+        static bool interrupt_enabled;
+
+        /// <summary>
+        /// зацикливание вкл
+        /// </summary>
+        static bool loop_enabled;
+
+        /// <summary>
+        /// частота
+        /// </summary>
+        static  int frequency;
+
+        /// <summary>
+        /// таблица частот NTSC
+        /// </summary>
+        static readonly int[] NTSC_FrequencyTable = {428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54};
+
+        /// <summary>
+        /// Метод установки флагов и частоты
         /// </summary>
         public static void FlagsandRate(byte val)
         {
-
+            interrupt_enabled = (val & (1 << 7)) != 0; 
+            loop_enabled = (val & (1 << 6)) != 0; 
+            int frequencyCode = val & 0xF;
+            frequency = NTSC_FrequencyTable[frequencyCode];
         }
 
         /// <summary>
