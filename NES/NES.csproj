@@ -59,6 +59,7 @@
     <Compile Include="APU\DMC.cs" />
     <Compile Include="APU\Sequencer.cs" />
     <Compile Include="APU\Sweep.cs" />
+    <Compile Include="APU\Envelope.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
