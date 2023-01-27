@@ -32,6 +32,11 @@ namespace NES.APU
 		bool negate;
 
 		/// <summary>
+		/// Величина изменения
+		/// </summary>
+		int amount;
+
+		/// <summary>
 		/// Число бит сдвига периода
 		/// </summary>
 		int shift;
@@ -39,7 +44,7 @@ namespace NES.APU
 		/// <summary>
 		/// Инициализируем объект Sweep по входному значению типа byte
 		/// </summary>
-		public Sweep(byte value)
+		public void Set(byte value)
 		{
 			/// <summary>
 			/// 7й бит
@@ -50,7 +55,7 @@ namespace NES.APU
 			/// 6-4й бит
 			/// </summary>
 			period = (value >> 4) & 0x07;
-			divider = new Divider(period);
+			divider = new Divider(period + 1);
 			/// <summary>
 			/// 3й бит
 			/// </summary>
@@ -60,22 +65,13 @@ namespace NES.APU
 			/// 2-0й бит
 			/// </summary>
 			shift = value & 0x07;
-		}
-
-		public void Start()
-		{
-			enable = true;
-		}
-
-		public void Stop()
-		{
-			enable = false;
+			amount = period >> shift;
 		}
 
 		/// <summary>
 		/// Обновляем период делителя
 		/// </summary>
-		public void UpdatePeriod()
+		public void Clock()
 		{
 			if (enable)
 			{
