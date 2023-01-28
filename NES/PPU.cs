@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -217,15 +217,16 @@ namespace NES
         public static bool vertical_blank;
 
         /// <summary>
-        ///   Координата x тайла.
+        ///   Координата x внутри тайла от 0 до 7.
         /// </summary>
         static byte tile_x;
 
 
         /// <summary>
-        ///   Координата y тайла.
+        ///   Координата y внутри тайла от 0 до 7.
         /// </summary>
         static byte tile_y;
+
 
         /// <summary>
         /// Функция чтения из памяти
@@ -472,6 +473,72 @@ namespace NES
             generate_nmi = ((val >> 7) & 1) > 0;
         }
 
+	delegate ushort MirrorReturn(ushort adr);
+	struct MirAdr
+        {
+            public ushort adr;
+
+            public MirrorReturn ret;
+
+            public MirAdr(ushort a, MirrorReturn r)
+            {
+                adr = a;
+                ret = r;
+            }
+        }
+	
+	static MirAdr[] mirroringTable = new MirAdr[]
+        {
+            new MirAdr(0x2FFF, MirrorAdrType),
+            new MirAdr(0x3EFF, MirrorOnMir),
+            new MirAdr(0x3F1F, MirrorPalRAM),
+            new MirAdr(0x3FFF, MirrorOnPalRAM)
+        };
+
+	static ushort MirrorAdrType(ushort adr)
+        {
+
+            if (Cartridge.mirroring == Mirroring.Horisontal)
+            {
+                if (((adr >= 0x2400) && (adr < 0x2800)) || (adr >= 0x2C00))
+                    adr -= 0x400;
+            }
+            else if (Cartridge.mirroring == Mirroring.Vertical)
+            {
+                if (adr >= 0x2800)
+                    adr -= 0x800;
+            }
+            else if (Cartridge.mirroring == Mirroring.Single)
+            {
+                if (adr >= 0x2400)
+                {
+                    while (adr >= 0x2400)
+                        adr -= 0x400;
+                }
+            }
+            return adr;
+        }
+
+        static ushort MirrorOnMir(ushort adr)
+        {
+            adr -= 0x1000;
+            return MirrorAdrType(adr);
+        }
+
+	static ushort MirrorPalRAM(ushort adr)
+        {
+            if ((adr == 0x3F10) || (adr == 0x3F14) || (adr == 0x3F18) || (adr == 0x3F1C))
+                adr -= 0x10;
+            return adr;
+        }
+
+	static ushort MirrorOnPalRAM(ushort adr)
+        {
+            while(adr >= 0x3F1F)
+                adr -= 0x20;
+            return adr;
+        }
+	
         /// <summary>
         /// Вычисляет настоящий адрес на основе зеркалированного адреса
         /// </summary>
@@ -479,12 +546,14 @@ namespace NES
         /// <returns>Настоящий адрес</returns>
         public static ushort MirrorAdr(ushort adr)
         {
-            if (Cartridge.mirroring == Mirroring.Horisontal)
+            for(int i = 0; i < mirroringTable.Length; i++)
             {
-                if (((adr >= 0x2400) && (adr < 0x2800)) || (adr >= 0x2C00))
-                    adr -= 0x400;
+                if(adr <= mirroringTable[i].adr)
+                {
+                    return mirroringTable[i].ret(adr);
+                }
             }
-            return adr;
+            return 0;
         }
 
         /// <summary>
@@ -623,13 +692,20 @@ if (sprite_color == 0)
             address = MirrorAdr((ushort)(NAME_TABLE + (nametable << 10) + (coarse_y << 5) + coarse_x));
         }
 
+
         /// <summary>
         /// Перейти на следующую плитку
         /// </summary>
         static void NextTile()
         {
+            if (GetCurX() == 31)
+            {
+                address = (ushort)(address ^ 0x400);
+                address = (ushort)(address & 0xFFE0);
+            }
+            else
+                address++;
             tile_x = 0;
-            address++;
         }
 
         /// <summary>
@@ -718,7 +794,7 @@ if (sprite_color == 0)
         {
             int x = GetCurX();
             int y = GetCurY();
-            byte attr = memory[0x3c0 + NAME_TABLE + nametable * 0x400 + x / 4  + y / 4 * 8];
+            byte attr = memory[MirrorAdr((ushort)(0x3c0 + NAME_TABLE + nametable * 0x400 + x / 4 + y / 4 * 8))];
             //int b2 = attr / 8 % 8;
 
             int ix = x % 4;

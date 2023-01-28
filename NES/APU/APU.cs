@@ -8,8 +8,125 @@ namespace NES.APU
 {
     class APU
     {
-        /// <summary>
-        /// Функцмя записи в APU 
+	/// <summary>
+	/// флаг Pulse1
+	/// </summary>
+	static bool enablePulse1;
+
+	/// <summary>
+	/// флаг Pulse2
+	/// </summary>
+	static bool enablePulse2;
+
+	/// <summary>
+	/// флаг Triangle
+	/// </summary>
+	static bool enableTriangle;
+
+	/// <summary>
+	/// флаг Noise
+	/// </summary>
+	static bool enableNoise;
+
+	/// <summary>
+	/// флаг DMC
+	/// </summary>
+	static bool enableDMC;
+	
+	/// <summary>
+        /// Импульсный канал
+        /// </summary>
+        struct Pulse
+        {
+            /// <summary>
+            /// режим
+            /// </summary>
+            public int duty;
+
+            /// <summary>
+            /// окутывать цыкл
+            /// </summary>
+            public int envelopeLoop;
+
+            /// <summary>
+            /// постоянная громкость
+            /// </summary>
+            public int constantVolume;
+
+            /// <summary>
+            /// громкость
+            /// </summary>
+            public int volume;
+
+            /// <summary>
+            /// отключённый
+            /// </summary>
+            public int enabled;
+
+            /// <summary>
+            /// период
+            /// </summary>
+            public int period;
+
+            /// <summary>
+            /// отрицать
+            /// </summary>
+            public int negate;
+
+            /// <summary>
+            /// сдвиг
+            /// </summary>
+            public int shift;
+
+            /// <summary>
+            /// низкий таймер
+            /// </summary>
+            public int timerLow;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public int lengthCounterLoad;
+
+            /// <summary>
+            /// высокий таймер
+            /// </summary>
+            public int timerHigh;
+        }
+
+	/// <summary>
+        /// Треугольный канал создаёт квантовую треугольную волну 
+        /// </summary>
+        struct Triangle
+        {
+            /// <summary>
+            /// остановщик счетика длинны 
+            /// </summary>
+            public int lengthCounterHalt;
+
+            /// <summary>
+            /// линейная встречная нагрузка
+            /// </summary>
+            public int linearCounterLoad;
+
+            /// <summary>
+            /// таймер низких
+            /// </summary>
+            public int timerLow;
+
+            /// <summary>
+            /// длина встречной нагрузки
+            /// </summary>
+            public int lengthCounterLoad;
+
+            /// <summary>
+            /// таймер выскокий 
+            /// </summary>
+            public int timerHigh;
+        }
+	
+	/// <summary>
+        /// Функция записи в APU 
         /// </summary>
         /// <param name="val">Значение</param>
         delegate void APUWrite(byte val);
@@ -33,10 +150,15 @@ namespace NES.APU
             new Register( 0x4001, Pulse1Length ),
             new Register( 0x4002, Pulse1Envelope ),
             new Register( 0x4003, Pulse1Sweep ),
-            new Register( 0x4004,  Pulse2Timer ),
+            new Register( 0x4004, Pulse2Timer ),
             new Register( 0x4005, Pulse2Length ),
             new Register( 0x4006, Pulse2Envelope ),
             new Register( 0x4007, Pulse2Sweep ),
+	    new Register( 0x4010, DMC.FlagsandRate),
+            new Register( 0x4011, DMC.Directload ),
+            new Register( 0x4012, DMC.Sampleaddress ),
+            new Register( 0x4013, DMC.Samplelength ),
+	    new Register( 0x4015, StatusWrite ),
         };
 
         /// <summary>
@@ -54,6 +176,19 @@ namespace NES.APU
                 }            
         }
 
+	/// <summary>
+        /// Функция установки флагов каналов
+        /// </summary>
+        /// <param name="val"></param>
+        public static void StatusWrite(byte val)
+        {
+            enablePulse1 = (val & 0x01) != 0;
+            enablePulse2 = (val & 0x02) != 0;
+            enableTriangle = (val & 0x04) != 0;
+            enableNoise = (val & 0x08) != 0;
+            enableDMC = (val & 0x10) != 0;
+        }
+	
 	static void Pulse1Timer(byte val)
         {
             

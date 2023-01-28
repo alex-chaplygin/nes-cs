@@ -52,7 +52,14 @@
     <Compile Include="Input.cs" />
     <Compile Include="Mappers\MMC1.cs" />
     <Compile Include="Mappers\MMC2.cs" />
+    <Compile Include="Mappers\MMC3.cs" />
     <Compile Include="APU\Divider.cs" />
+    <Compile Include="APU\APU.cs" />
+    <Compile Include="APU\LengthCounter.cs" />
+    <Compile Include="APU\DMC.cs" />
+    <Compile Include="APU\Sequencer.cs" />
+    <Compile Include="APU\Sweep.cs" />
+    <Compile Include="APU\Envelope.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
