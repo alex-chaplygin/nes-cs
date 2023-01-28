@@ -21,11 +21,11 @@ namespace NES.APU
         /// <summary>
         /// Уровень громкости
         /// </summary>
-        static int volume;
+        public int volume;
 
         /// <summary>
         /// Флаг постоянной громкости
         /// </summary>
-        static bool const_volume;       
+        public bool const_volume;       
     }
 }
