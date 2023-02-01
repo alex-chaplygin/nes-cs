@@ -6,11 +6,12 @@ namespace NES
 	{
 		private int period;
 		private int counter;
+	    private static readonly int[] table = {428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54};
 
-		public Divider(int period)
+		public Divider(int code)
 		{
-			this.period = period;
-			this.counter = period;
+		    period = table[code];
+		    counter = period;
 		}
 
 		public bool Clock()
@@ -34,12 +35,13 @@ namespace NES
 
 		public int Get()
 		{
-			return period;
+		    return period;
 		}
 
 		public void Set(int val)
 		{
-			period = val;
+		    period = table[val];
+		    counter = period;
 		}
 	}
 }

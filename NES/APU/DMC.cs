@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +12,10 @@ namespace NES.APU
         /// Флаг IRQ
         /// </summary>
         static bool irq_flag;
+
+        static bool contain_flag;
+
+        static byte sample_buffer;
 
         /// <summary>
         /// Флаг цикла
@@ -27,7 +31,7 @@ namespace NES.APU
         /// выходной уровень (громкость канала)
         /// </summary>
 
-        static Byte sirect_load;
+        static byte volume;
 
         /// <summary>
         /// адрес отсчётов
@@ -50,9 +54,9 @@ namespace NES.APU
         static bool loop_enabled;
 
         /// <summary>
-        /// частота
+        /// таймер
         /// </summary>
-        static  int frequency;
+        static Divider timer = new Divider(0);
 
         /// <summary>
         /// таблица частот NTSC
@@ -67,7 +71,7 @@ namespace NES.APU
             interrupt_enabled = (val & (1 << 7)) != 0; 
             loop_enabled = (val & (1 << 6)) != 0; 
             int frequencyCode = val & 0xF;
-            frequency = NTSC_FrequencyTable[frequencyCode];
+            timer.Set(NTSC_FrequencyTable[frequencyCode]);
         }
 
         /// <summary>
@@ -75,7 +79,8 @@ namespace NES.APU
         /// </summary>
         public static void Directload(byte val)
         {
-
+            volume = (byte)(val & 0x7F);
+            
         }
 
         /// <summary>
@@ -83,7 +88,9 @@ namespace NES.APU
         /// </summary>
         public static void Sampleaddress(byte val)
         {
-
+            
+            sample_address = (ushort)(0xC000 + (val * 64));
+            
         }
 
         /// <summary>
@@ -91,7 +98,28 @@ namespace NES.APU
         /// </summary>
         public static void Samplelength(byte val)
         {
+            sample_length = (val * 16) + 1;
+        }
 
+        public static void BufferIn()
+        {
+            if (!contain_flag)
+            {
+                sample_buffer = Memory.Read(sample_address++);
+                contain_flag = true;
+            }
+        }
+
+	public static byte BufferOut()
+        {
+            if (contain_flag)
+            {
+
+                contain_flag = false;
+                
+
+            }
+            return sample_buffer;
         }
     }
 }
