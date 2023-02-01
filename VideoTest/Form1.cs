@@ -1,4 +1,4 @@
-﻿using NES;
+using NES;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -18,7 +18,7 @@ namespace NES
         Right
     }
     
-    internal class Input
+    public class Input
     {
 	const ushort CONTROLER1 = 0x4016;
 	
