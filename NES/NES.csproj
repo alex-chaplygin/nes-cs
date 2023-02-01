@@ -60,6 +60,7 @@
     <Compile Include="APU\Sequencer.cs" />
     <Compile Include="APU\Sweep.cs" />
     <Compile Include="APU\Envelope.cs" />
+    <Compile Include="APU\Noise.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

@@ -159,6 +159,9 @@ namespace NES.APU
             new Register( 0x4012, DMC.Sampleaddress ),
             new Register( 0x4013, DMC.Samplelength ),
 	    new Register( 0x4015, StatusWrite ),
+	    new Register( 0x400C, Noise.SetParametrs),
+	    new Register( 0x400E, Noise.ModePeriod),
+	    new Register( 0x400F, Noise.LengthCounterLoad)
         };
 
         /// <summary>
